@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E1B3A">
+<title>Monster Egg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&family=Itim&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  color-scheme: dark;
+  --night:#1E1B3A; --night-2:#2A2552; --night-3:#3A3470; --line:#4A438A;
+  --shell:#FFF4DC; --mist:#B7B0E6; --dim:#8780BF;
+  --yolk:#FFC93C; --yolk-ink:#3A2A00; --bad:#FF7A7A; --good:#5BE3A8;
+  --r1:#A3A9BF; --r2:#43D69C; --r3:#9C8CFF; --r4:#FFB31F; --r5:#FF5FA2;
+  --display:"Itim", "IBM Plex Sans Thai Looped", system-ui, sans-serif;
+  --body:"IBM Plex Sans Thai Looped", system-ui, sans-serif;
+  --nav-h:68px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--night);
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #ffffff55 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 9%, #ffffff44 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 64% 32%, #ffffff33 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 72%, #ffffff33 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 61%, #ffffff44 50%, transparent 51%),
+    radial-gradient(120% 70% at 50% 110%, #2E2766 0%, transparent 60%);
+  background-attachment:fixed;
+  color:var(--shell); font-family:var(--body); font-size:16px; line-height:1.55;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:disabled{cursor:not-allowed;opacity:.5}
+:focus-visible{outline:3px solid var(--yolk);outline-offset:2px;border-radius:10px}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:0 16px calc(var(--nav-h) + 20px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--mist)}
+.hidden{display:none !important}
+
+/* ── ปุ่ม ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:16px;
+  background:var(--yolk);color:var(--yolk-ink);font-weight:600;font-size:17px;box-shadow:0 4px 0 #C8901A;transition:transform .08s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 #C8901A}
+.btn.ghost{background:var(--night-3);color:var(--shell);box-shadow:0 4px 0 #26215A}
+.btn.ghost:active:not(:disabled){box-shadow:0 1px 0 #26215A}
+.btn.small{min-height:38px;padding:0 14px;font-size:15px;border-radius:12px}
+.coin{display:inline-block;width:1em;height:1em;vertical-align:-.12em;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE9A3,#FFC93C 55%,#D99A12);box-shadow:inset 0 0 0 .08em #B87F0B}
+
+/* ── หน้าแรก ── */
+.welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 0;gap:14px}
+.welcome h1{font-size:clamp(44px,13vw,64px);color:var(--yolk);letter-spacing:.5px}
+.welcome p{margin:0;color:var(--mist);max-width:30ch}
+.welcome form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:10px}
+.field{width:100%;min-height:50px;border-radius:14px;border:2px solid var(--line);background:var(--night-2);color:var(--shell);
+  font:inherit;font-size:17px;padding:0 16px;text-align:center}
+.field:focus{border-color:var(--yolk);outline:none}
+.note{font-size:13px;color:var(--dim);max-width:34ch}
+.err{color:var(--bad);font-size:14px;min-height:1.4em}
+
+/* ── แถบบน ── */
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:12px 0 10px;background:linear-gradient(var(--night) 75%,transparent)}
+.who{flex:1;min-width:0}
+.who b{display:block;font-family:var(--display);font-weight:400;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{font-size:13px;color:var(--mist)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--night-2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600}
+.energy{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.pips{display:flex;gap:2px}
+.pip{width:7px;height:12px;border-radius:3px;background:var(--night-3)}
+.pip.on{background:var(--good)}
+.etime{font-size:11px;color:var(--mist)}
+.gift{position:relative;width:44px;height:44px;border-radius:14px;background:var(--night-2);border:1px solid var(--line);display:grid;place-items:center}
+.gift.ready{border-color:var(--yolk);background:#3B3060}
+.gift.ready::after{content:"";position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:var(--bad);border:2px solid var(--night)}
+
+/* ── แท็บล่าง ── */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;background:#17142F;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.nav-in{display:flex;width:100%;max-width:520px}
+.nav button{flex:1;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;color:var(--dim)}
+.nav button[aria-current="page"]{color:var(--yolk)}
+.nav svg{width:26px;height:26px}
+
+/* ── หัวข้อหน้า ── */
+.view{display:flex;flex-direction:column;gap:16px;padding-top:4px}
+.view h2{font-size:28px}
+.row{display:flex;align-items:center;gap:10px}
+.spread{justify-content:space-between}
+
+/* ── ฟักไข่ ── */
+.eggpick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.eggpick button{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:var(--night-2);border:2px solid var(--line);text-align:left}
+.eggpick button[aria-pressed="true"]{border-color:var(--yolk);background:#332C62}
+.eggpick svg{width:40px;height:48px;flex:none}
+.eggpick b{display:block;font-weight:600}
+.eggpick span{font-size:14px;color:var(--mist)}
+.eggpick small{display:block;font-size:12px;color:var(--yolk)}
+.nest{position:relative;height:300px;display:grid;place-items:center}
+.nest .glow{position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,#FFC93C2E,transparent 65%)}
+.nest .bed{position:absolute;bottom:26px;width:220px;height:44px;border-radius:50%;background:radial-gradient(ellipse at 50% 30%,#5A4A2C,#2F2618 70%);box-shadow:inset 0 6px 0 #6E5A33}
+.bigegg{position:relative;width:170px;height:210px;margin-bottom:30px;transform-origin:50% 90%}
+.bigegg svg{width:100%;height:100%;overflow:visible}
+.bigegg.wobble{animation:wob 2.6s ease-in-out infinite}
+.bigegg.shake{animation:shk .16s linear infinite}
+@keyframes wob{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-5deg)}90%{transform:rotate(5deg)}95%{transform:rotate(-3deg)}}
+@keyframes shk{0%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}100%{transform:rotate(-6deg)}}
+.bigegg .half-top,.bigegg .half-bot{opacity:0}
+.cracking .half-top,.cracking .half-bot{opacity:1}
+.cracking .whole{opacity:0}
+.crack{stroke:#3A2A00;stroke-width:3.5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:260;stroke-dashoffset:260}
+.cracking .crack{animation:drawc .45s ease-out forwards}
+@keyframes drawc{to{stroke-dashoffset:0}}
+.split .half-top{animation:popt .5s ease-in forwards}
+.split .half-bot{animation:popb .5s ease-in forwards}
+@keyframes popt{to{transform:translate(-30px,-90px) rotate(-35deg);opacity:0}}
+@keyframes popb{to{transform:translate(20px,40px) rotate(15deg);opacity:0}}
+.odds{display:flex;flex-wrap:wrap;gap:6px;font-size:13px}
+.odds span{padding:2px 9px;border-radius:999px;background:var(--night-2);border:1px solid var(--line)}
+.odds i{font-style:normal;font-weight:600}
+
+/* ── การ์ดมอนสเตอร์ ── */
+.r1{--rc:var(--r1)} .r2{--rc:var(--r2)} .r3{--rc:var(--r3)} .r4{--rc:var(--r4)} .r5{--rc:var(--r5)}
+.rtag{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;color:#1B1838;background:var(--rc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+.card{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 6px 8px;border-radius:16px;background:var(--night-2);border:2px solid var(--rc);text-align:center;min-width:0}
+.card .art{width:100%;aspect-ratio:1;border-radius:12px;background:radial-gradient(circle at 50% 60%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
+.card .art svg{width:100%;height:100%}
+.card .nm{font-family:var(--display);font-size:17px;line-height:1.1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.card .st{font-size:12px;color:var(--mist)}
+.card .inteam{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:var(--yolk);color:var(--yolk-ink);font-size:12px;font-weight:600;display:grid;place-items:center}
+.r5.card,.r5.reveal{border-color:transparent;background:linear-gradient(var(--night-2),var(--night-2)) padding-box,conic-gradient(from var(--ang,0deg),#FF5FA2,#FFC93C,#43D69C,#5AB8FF,#9C8CFF,#FF5FA2) border-box}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.r5.card,.r5.reveal{animation:spin 4s linear infinite}
+@keyframes spin{to{--ang:360deg}}
+
+.reveal{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:22px;background:var(--night-2);border:3px solid var(--rc);text-align:center}
+.reveal .art{width:200px;height:200px}
+.reveal .art svg{width:100%;height:100%}
+.reveal h3{font-size:32px}
+.reveal .tid{font-size:13px;color:var(--dim)}
+.burst{animation:burst .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes burst{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;margin-top:6px}
+.stats div{background:var(--night);border-radius:12px;padding:6px 4px}
+.stats b{display:block;font-size:20px;font-family:var(--display);font-weight:400}
+.stats span{font-size:12px;color:var(--mist)}
+.quality{width:100%;font-size:13px;color:var(--mist)}
+.qbar{height:8px;border-radius:99px;background:var(--night);overflow:hidden;margin-top:3px}
+.qbar i{display:block;height:100%;background:var(--rc)}
+
+/* ── ทีม ── */
+.team{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{min-height:120px;border-radius:16px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:var(--dim);padding:6px;text-align:center}
+.slot.full{border-style:solid;border-color:var(--rc);background:var(--night-2);color:var(--shell)}
+.slot svg{width:72px;height:72px}
+.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.filters button{flex:none;padding:4px 12px;border-radius:999px;border:1px solid var(--line);font-size:14px;background:var(--night-2)}
+.filters button[aria-pressed="true"]{background:var(--shell);color:var(--night);border-color:var(--shell)}
+.empty{padding:28px 12px;text-align:center;color:var(--mist);border:2px dashed var(--line);border-radius:18px}
+
+/* ── แผ่นรายละเอียด ── */
+.scrim{position:fixed;inset:0;z-index:40;background:#0C0A1Fcc;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--night);border-radius:24px 24px 0 0;border-top:3px solid var(--rc,var(--line));padding:18px 16px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet .reveal{border:0;padding:0;background:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1}
+
+/* ── ออกสู้ ── */
+.stagebox{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--night-2);border-radius:20px;padding:12px;border:1px solid var(--line)}
+.stagebox .n{font-family:var(--display);font-size:40px;line-height:1;text-align:center;min-width:110px}
+.stagebox .n small{display:block;font-family:var(--body);font-size:13px;color:var(--mist)}
+.step{width:52px;height:52px;border-radius:16px;background:var(--night-3);font-size:26px;font-weight:600}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+.facts div{background:var(--night-2);border-radius:14px;padding:8px 12px}
+.facts b{display:block;font-size:18px}
+.arena{display:flex;flex-direction:column;gap:10px;background:radial-gradient(120% 80% at 50% 50%,#2C2560,#1B1838);border-radius:22px;padding:12px;border:1px solid var(--line);position:relative;overflow:hidden}
+.side{display:flex;justify-content:center;gap:6px}
+.side .unit{flex:0 1 33.3%;min-width:0}
+.unit{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .18s, opacity .3s}
+.unit .art{width:84px;height:84px}
+.unit .art svg{width:100%;height:100%}
+.unit .hp{width:88%;height:9px;border-radius:99px;background:#110E26;overflow:hidden;border:1px solid #0006}
+.unit .hp i{display:block;height:100%;background:var(--good);transition:width .25s}
+.unit.foe .hp i{background:var(--bad)}
+.unit .hpn{font-size:11px;color:var(--mist)}
+.unit.dead{opacity:.25;filter:grayscale(1)}
+.unit.hit .art{animation:hit .25s}
+@keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.unit.lunge-up{transform:translateY(-18px)}
+.unit.lunge-down{transform:translateY(18px)}
+.pop{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:24px;color:#fff;text-shadow:0 2px 0 #0008;pointer-events:none;animation:float .8s ease-out forwards;white-space:nowrap}
+.pop.crit{font-size:30px;color:var(--yolk)}
+.pop.weak{color:var(--mist);font-size:20px}
+.pop.strong{color:var(--good)}
+@keyframes float{from{transform:translate(-50%,0);opacity:1}to{transform:translate(-50%,-34px);opacity:0}}
+.vs{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mist)}
+.banner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#120F2Bd9;text-align:center;padding:16px;animation:burst .4s ease-out}
+.banner h3{font-size:48px}
+.banner.win h3{color:var(--yolk)}
+.banner.lose h3{color:var(--mist)}
+
+/* ── อันดับ ── */
+.board{display:flex;flex-direction:column;gap:6px}
+.lb{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--night-2)}
+.lb.me{outline:2px solid var(--yolk)}
+.lb .rk{font-family:var(--display);font-size:22px;text-align:center;color:var(--mist)}
+.lb:nth-child(1) .rk{color:var(--yolk)}
+.lb .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb .sub{font-size:12px;color:var(--mist)}
+.lb .stg{text-align:right;font-family:var(--display);font-size:20px}
+.lb .stg small{display:block;font-family:var(--body);font-size:11px;color:var(--mist)}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;max-width:min(92vw,480px);
+  background:var(--shell);color:var(--night);font-weight:600;padding:10px 18px;border-radius:14px;box-shadow:0 8px 30px #0007;text-align:center}
+.toast.bad{background:var(--bad);color:#2A0606}
+.loading{flex:1;display:grid;place-items:center;color:var(--mist)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app"><div class="loading">กำลังโหลด…</div></div>
+<nav class="nav hidden" id="nav" aria-label="เมนูหลัก"><div class="nav-in">
+  <button data-tab="hatch" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-4 0-7 6-7 10.5A7 7 0 0 0 19 13.5C19 9 16 3 12 3z"/></svg>ฟักไข่</button>
+  <button data-tab="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M3 8l3-4h12l3 4M10 12h4"/></svg>กล่อง</button>
+  <button data-tab="fight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l10 10M4 4h4M4 4v4M20 4L10 14M20 4h-4M20 4v4M7 17l-3 3M17 17l3 3M8.5 15.5l-2 2M15.5 15.5l2 2"/></svg>ออกสู้</button>
+  <button data-tab="rank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4h10v4a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>อันดับ</button>
+</div></nav>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   Monster Egg — หน้าเกม
+   เหรียญ ไข่ ผลการสู้ อยู่บนเซิร์ฟเวอร์ (Supabase) ทั้งหมด หน้านี้แค่ส่งคำขอและแสดงผล
+   แก้หน้านี้ในเบราว์เซอร์ก็เพิ่มเหรียญไม่ได้ เพราะเซิร์ฟเวอร์เป็นคนตัดสินทุกอย่าง
+   ═══════════════════════════════════════════════════════════════ */
+const SUPABASE_URL = "https://uybxunjogjhhvaynhoql.supabase.co";
+const SUPABASE_KEY = "sb_publishable_zpUV0iaVJPTuv9WKUMuUUg_WmX0_C_o";   // คีย์สาธารณะ (ใส่ในหน้าเว็บได้)
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = n => Number(n || 0).toLocaleString("th-TH");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+let sb = null;
+const S = { me: null, mons: [], cat: null, tab: "hatch", egg: "normal", filter: 0, stage: 1, busy: false, nextAt: 0, hatched: null };
+
+/* ── ติดต่อเซิร์ฟเวอร์ ── */
+async function rpc(fn, args) {
+  const { data, error } = await sb.rpc(fn, args || {});
+  if (error) throw new Error(error.message || "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+  return data;
+}
+function take(d) {   // รับสถานะใหม่จากเซิร์ฟเวอร์
+  if (!d) return;
+  if (d.catalog) S.cat = prepCat(d.catalog);
+  if ("player" in d) S.me = d.player;
+  if (d.monsters) S.mons = d.monsters;
+  if (S.me) S.nextAt = S.me.energy_next ? Date.now() + S.me.energy_next * 1000 : 0;
+}
+function prepCat(c) {
+  const sp = {}; (c.species || []).forEach(x => sp[x.id] = x);
+  const rr = {}; (c.rarity || []).forEach(x => rr[x.tier] = x);
+  return Object.assign({}, c, { sp, rr });
+}
+
+/* ── ข้อความเด้ง ── */
+let toastT = 0;
+function toast(msg, bad) {
+  let t = $(".toast"); if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.toggle("bad", !!bad); t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2800);
+}
+
+/* ═══════════ รูปมอนสเตอร์ (สร้างจาก DNA — ทุกตัวไม่ซ้ำกัน) ═══════════ */
+const ELEM = { fire: { h: 14, th: "ไฟ" }, water: { h: 205, th: "น้ำ" }, leaf: { h: 128, th: "ไม้" }, light: { h: 46, th: "แสง" }, dark: { h: 270, th: "มืด" } };
+const BEATS = { fire: "leaf", leaf: "water", water: "fire", light: "dark", dark: "light" };
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+let gid = 0;
+function blobPath(cx, cy, rx, ry, R, wob) {
+  const n = 9, pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / n, k = 1 + (R() - 0.5) * wob;
+    const bottom = Math.sin(a) > 0.3 ? 0.96 : 1;   // ก้นแบนนิดหน่อย
+    pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k * bottom]);
+  }
+  let d = "";
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    if (i === 0) d += `M${p1[0].toFixed(1)},${p1[1].toFixed(1)}`;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${c1[0].toFixed(1)},${c1[1].toFixed(1)} ${c2[0].toFixed(1)},${c2[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+  }
+  return d + "Z";
+}
+function monSVG(m) {
+  const sp = (S.cat && S.cat.sp[m.species]) || { element: "fire" };
+  const R = rng((m.dna | 0) ^ Math.imul(m.species + 1, 2654435761));
+  const el = sp.element, id = "g" + (++gid);
+  const hue = (ELEM[el].h + (R() * 34 - 17) + 360) % 360;
+  const sat = 62 + R() * 22, lig = el === "dark" ? 40 + R() * 8 : 54 + R() * 8;
+  const body = `hsl(${hue.toFixed(0)} ${sat.toFixed(0)}% ${lig.toFixed(0)}%)`;
+  const shade = `hsl(${hue.toFixed(0)} ${sat.toFixed(0)}% ${(lig - 16).toFixed(0)}%)`;
+  const belly = `hsl(${((hue + 25) % 360).toFixed(0)} ${(sat * 0.7).toFixed(0)}% ${Math.min(90, lig + 26).toFixed(0)}%)`;
+  const shape = (m.species - 1) % 4;   // 0 กลม · 1 สูง · 2 กว้าง · 3 ลูกแพร์
+  const rx = [33, 28, 38, 32][shape] + R() * 4, ry = [31, 36, 27, 33][shape] + R() * 4;
+  const cx = 60, cy = 70, top = cy - ry;
+  let s = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(sp.name || "มอนสเตอร์")}"><defs>`
+    + `<radialGradient id="${id}b" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="${belly}" stop-opacity=".55"/><stop offset=".45" stop-color="${body}"/><stop offset="1" stop-color="${shade}"/></radialGradient>`
+    + `<radialGradient id="${id}a" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
+  if (m.rarity >= 5) s += `<circle cx="60" cy="64" r="56" fill="url(#${id}a)"/>`;
+  s += `<ellipse cx="60" cy="${(cy + ry + 6).toFixed(1)}" rx="${(rx * 0.8).toFixed(1)}" ry="5" fill="#000" opacity=".25"/>`;
+  // ของประจำธาตุด้านหลัง/บนหัว
+  if (el === "fire") {
+    const fx = cx + (R() * 12 - 6);
+    s += `<path d="M${fx - 13},${top + 8} C${fx - 18},${top - 8} ${fx - 4},${top - 14} ${fx - 2},${top - 26} C${fx + 6},${top - 14} ${fx + 18},${top - 10} ${fx + 13},${top + 8} Z" fill="#FF9A3C"/>`
+      + `<path d="M${fx - 6},${top + 8} C${fx - 8},${top - 2} ${fx},${top - 6} ${fx + 1},${top - 14} C${fx + 5},${top - 5} ${fx + 9},${top - 2} ${fx + 6},${top + 8} Z" fill="#FFE07A"/>`;
+  } else if (el === "water") {
+    s += `<path d="M${cx - 6},${top + 6} Q${cx + 4},${top - 22} ${cx + 18},${top - 14} Q${cx + 10},${top - 2} ${cx + 10},${top + 8} Z" fill="${shade}"/>`
+      + `<path d="M${cx + 26},${top - 2} q4,7 0,10 q-4,-3 0,-10z" fill="#9EDBFF"/>`;
+  } else if (el === "leaf") {
+    s += `<path d="M${cx},${top + 4} q-1,-10 2,-16" stroke="#2F7A3A" stroke-width="3" fill="none" stroke-linecap="round"/>`
+      + `<path d="M${cx + 2},${top - 11} q-16,-10 -20,2 q12,6 20,-2z" fill="#6BD27A"/><path d="M${cx + 2},${top - 12} q14,-12 20,0 q-10,8 -20,0z" fill="#8FE39A"/>`;
+  } else if (el === "light") {
+    s += `<ellipse cx="${cx}" cy="${top - 10}" rx="17" ry="5" fill="none" stroke="#FFE680" stroke-width="3.5"/>`;
+  } else {
+    s += `<path d="M${cx - 18},${top + 10} q-10,-14 -4,-26 q4,12 12,18z" fill="#3B2350"/><path d="M${cx + 18},${top + 10} q10,-14 4,-26 q-4,12 -12,18z" fill="#3B2350"/>`;
+  }
+  // ตัว
+  s += `<path d="${blobPath(cx, cy, rx, ry, R, 0.16)}" fill="url(#${id}b)" stroke="${shade}" stroke-width="1.5"/>`;
+  s += `<ellipse cx="${cx}" cy="${(cy + ry * 0.35).toFixed(1)}" rx="${(rx * 0.55).toFixed(1)}" ry="${(ry * 0.45).toFixed(1)}" fill="${belly}" opacity=".85"/>`;
+  // ลายจุด
+  if (R() < 0.5) { const n = 2 + Math.floor(R() * 3); for (let i = 0; i < n; i++) { const a = -2.6 + R() * 2.2; s += `<circle cx="${(cx + Math.cos(a) * rx * 0.72).toFixed(1)}" cy="${(cy + Math.sin(a) * ry * 0.7).toFixed(1)}" r="${(2.5 + R() * 3).toFixed(1)}" fill="${shade}" opacity=".7"/>`; } }
+  // เท้า
+  s += `<ellipse cx="${cx - rx * 0.45}" cy="${cy + ry - 2}" rx="8" ry="5" fill="${shade}"/><ellipse cx="${cx + rx * 0.45}" cy="${cy + ry - 2}" rx="8" ry="5" fill="${shade}"/>`;
+  // ตา
+  const ne = R() < 0.12 ? 1 : (R() < 0.1 ? 3 : 2), er = 7 + R() * 3.5, ey = cy - ry * 0.25, look = R() * 3 - 1.5;
+  const exs = ne === 1 ? [cx] : ne === 2 ? [cx - 13, cx + 13] : [cx - 17, cx, cx + 17];
+  exs.forEach((x, i) => {
+    const r = ne === 3 && i === 1 ? er * 0.8 : (ne === 1 ? er * 1.4 : er), y = ne === 3 && i === 1 ? ey - 6 : ey;
+    s += `<circle cx="${x}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="#fff"/><circle cx="${(x + look).toFixed(1)}" cy="${(y + 1.5).toFixed(1)}" r="${(r * 0.52).toFixed(1)}" fill="#1B1430"/><circle cx="${(x + look - r * 0.2).toFixed(1)}" cy="${(y - r * 0.15).toFixed(1)}" r="${(r * 0.18).toFixed(1)}" fill="#fff"/>`;
+  });
+  // ปาก + แก้ม
+  const my = ey + er + 9, mt = Math.floor(R() * 3);
+  if (mt === 0) s += `<path d="M${cx - 8},${my} q8,7 16,0" stroke="#2A1A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  else if (mt === 1) s += `<path d="M${cx - 7},${my - 1} q7,12 14,0 z" fill="#5A1E2E"/><path d="M${cx - 3},${my + 4} q3,3 6,0" fill="#FF8FA3"/>`;
+  else s += `<path d="M${cx - 9},${my} q9,6 18,0" stroke="#2A1A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M${cx - 6},${my + 1.5} l2,5 l2,-4.5z M${cx + 6},${my + 1.5} l-2,5 l-2,-4.5z" fill="#fff"/>`;
+  if (R() < 0.55) s += `<ellipse cx="${cx - 21}" cy="${my - 3}" rx="5" ry="3" fill="#FF8FA3" opacity=".55"/><ellipse cx="${cx + 21}" cy="${my - 3}" rx="5" ry="3" fill="#FF8FA3" opacity=".55"/>`;
+  if (el === "light") s += `<path d="M${cx + rx - 4},${top + 6} l2,-6 l2,6 l6,2 l-6,2 l-2,6 l-2,-6 l-6,-2z" fill="#FFF3B0"/>`;
+  // ระดับสูง: มงกุฎ (ตำนาน) · ประกาย (เทพ)
+  if (m.rarity === 4) s += `<path d="M${cx - 13},${top + 2} l3,-13 l6,7 l4,-10 l4,10 l6,-7 l3,13 z" fill="#FFC93C" stroke="#B87F0B" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
+  if (m.rarity >= 5) {
+    s += `<path d="M${cx - 15},${top + 1} l3,-14 l6,7 l4,-11 l4,11 l6,-7 l3,14 z" fill="#FFE07A" stroke="#FF5FA2" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
+    [[16, 22], [102, 30], [98, 96], [20, 92]].forEach(([x, y], i) => { const k = i % 2 ? 4 : 6; s += `<path d="M${x},${y - k} l${k * 0.3},${k * 0.7} l${k * 0.7},${k * 0.3} l-${k * 0.7},${k * 0.3} l-${k * 0.3},${k * 0.7} l-${k * 0.3},-${k * 0.7} l-${k * 0.7},-${k * 0.3} l${k * 0.7},-${k * 0.3}z" fill="#FFF3B0"/>`; });
+  }
+  return s + "</svg>";
+}
+function eggSVG(kind, crackable) {
+  const gold = kind === "gold", id = "e" + (++gid);
+  const g = gold ? `<stop offset="0" stop-color="#FFF1B0"/><stop offset=".5" stop-color="#FFC93C"/><stop offset="1" stop-color="#C98A10"/>`
+                 : `<stop offset="0" stop-color="#FFFBF0"/><stop offset=".6" stop-color="#F2E2C2"/><stop offset="1" stop-color="#C9B48E"/>`;
+  const egg = "M60,6 C88,6 108,58 108,92 C108,122 86,140 60,140 C34,140 12,122 12,92 C12,58 32,6 60,6Z";
+  const spots = gold ? `<path d="M30,60 q10,-30 22,-40" stroke="#FFF8D6" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/>`
+    : `<circle cx="42" cy="54" r="6" fill="#D9C39A"/><circle cx="74" cy="40" r="4" fill="#D9C39A"/><circle cx="82" cy="88" r="7" fill="#D9C39A"/><circle cx="38" cy="102" r="5" fill="#D9C39A"/><circle cx="62" cy="118" r="3.5" fill="#D9C39A"/>`;
+  const inner = `<path d="${egg}" fill="url(#${id})" stroke="${gold ? "#B87F0B" : "#B09A72"}" stroke-width="2"/>${spots}`;
+  if (!crackable) return `<svg viewBox="0 0 120 146" aria-hidden="true"><defs><radialGradient id="${id}" cx="38%" cy="30%" r="80%">${g}</radialGradient></defs>${inner}</svg>`;
+  const zig = "M14,80 L28,70 L38,84 L50,68 L60,82 L72,66 L82,82 L94,70 L106,80";
+  return `<svg viewBox="0 0 120 146" aria-hidden="true"><defs><radialGradient id="${id}" cx="38%" cy="30%" r="80%">${g}</radialGradient>`
+    + `<clipPath id="${id}t"><path d="M0,0 H120 V80 L106,80 L94,70 L82,82 L72,66 L60,82 L50,68 L38,84 L28,70 L14,80 L0,80Z"/></clipPath>`
+    + `<clipPath id="${id}d"><path d="M0,146 H120 V80 L106,80 L94,70 L82,82 L72,66 L60,82 L50,68 L38,84 L28,70 L14,80 L0,80Z"/></clipPath></defs>`
+    + `<g class="whole">${inner}</g>`
+    + `<g class="half-top" style="transform-box:fill-box;transform-origin:center" clip-path="url(#${id}t)">${inner}</g>`
+    + `<g class="half-bot" style="transform-box:fill-box;transform-origin:center" clip-path="url(#${id}d)">${inner}</g>`
+    + `<path class="crack" d="${zig}"/></svg>`;
+}
+
+/* ── ข้อมูลตัว ── */
+const spOf = m => (S.cat && S.cat.sp[m.species]) || { name: "?", element: "fire", atk: 1, hp: 1 };
+const rName = t => (S.cat && S.cat.rr[t] && S.cat.rr[t].name) || "";
+const power = m => m.atk * 4 + m.hp;
+function quality(m) {
+  const sp = spOf(m), mult = +((S.cat && S.cat.rr[m.rarity] && S.cat.rr[m.rarity].mult) || 1);
+  const q = ((m.atk / (sp.atk * mult)) + (m.hp / (sp.hp * mult))) / 2;   // 0.9–1.1
+  return Math.max(0, Math.min(100, Math.round((q - 0.9) / 0.2 * 100)));
+}
+const inTeam = id => (S.me && Array.isArray(S.me.team) ? S.me.team.map(Number) : []).indexOf(Number(id));
+
+/* ═══════════ หน้าจอ ═══════════ */
+function render() {
+  const app = $("#app");
+  if (!S.me) return;
+  $("#nav").classList.remove("hidden");
+  document.querySelectorAll("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.tab === S.tab ? "page" : "false"));
+  const P = S.me;
+  const pips = Array.from({ length: P.energy_max }, (_, i) => `<i class="pip${i < P.energy ? " on" : ""}"></i>`).join("");
+  app.innerHTML = `
+    <header class="top">
+      <div class="who"><b>${esc(P.name)}</b><span>ด่านสูงสุด ${fmt(P.best_stage)}</span></div>
+      <div class="energy" title="พลังงานใช้สู้ครั้งละ 1"><div class="pips" aria-label="พลังงาน ${P.energy} จาก ${P.energy_max}">${pips}</div><span class="etime" id="etime"></span></div>
+      <span class="chip num" aria-label="เหรียญ"><i class="coin"></i>${fmt(P.coins)}</span>
+      <button class="gift${P.daily_ready ? " ready" : ""}" id="gift" aria-label="${P.daily_ready ? "รับรางวัลวันนี้" : "รับรางวัลวันนี้แล้ว"}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${P.daily_ready ? "#FFC93C" : "#8780BF"}" stroke-width="2"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 13h18M12 9v12M12 9c-2-4-7-4-6-1s6 1 6 1zM12 9c2-4 7-4 6-1s-6 1-6 1z"/></svg>
+      </button>
+    </header>
+    <main class="view" id="view"></main>`;
+  $("#gift").onclick = claimDaily;
+  ({ hatch: viewHatch, box: viewBox, fight: viewFight, rank: viewRank })[S.tab]();
+  tick();
+}
+function tick() {
+  const el = $("#etime"); if (!el || !S.me) return;
+  if (S.me.energy >= S.me.energy_max) { el.textContent = "เต็ม"; return; }
+  const left = Math.max(0, Math.ceil((S.nextAt - Date.now()) / 1000));
+  el.textContent = left ? `+1 ใน ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "กำลังฟื้น…";
+}
+setInterval(async () => {
+  tick();
+  if (S.me && S.nextAt && Date.now() > S.nextAt + 1500 && !S.busy && !$(".arena")) {
+    S.nextAt = 0;
+    try { take(await rpc("game_me")); render(); } catch (e) { }
+  }
+}, 1000);
+
+/* ── ฟักไข่ ── */
+function viewHatch() {
+  const C = S.cat, price = C.eggs[S.egg], w = S.egg === "gold" ? "w_gold" : "w_normal";
+  const odds = C.rarity.filter(r => r[w] > 0).map(r => `<span class="r${r.tier}"><i style="color:var(--rc)">${esc(r.name)}</i> ${(r[w] / 100).toLocaleString("th-TH", { maximumFractionDigits: 1 })}%</span>`).join("");
+  $("#view").innerHTML = `
+    <div class="eggpick" role="group" aria-label="เลือกไข่">
+      <button data-egg="normal" aria-pressed="${S.egg === "normal"}">${eggSVG("normal")}<div><b>ไข่ธรรมดา</b><span><i class="coin"></i> ${fmt(C.eggs.normal)}</span></div></button>
+      <button data-egg="gold" aria-pressed="${S.egg === "gold"}">${eggSVG("gold")}<div><b>ไข่ทอง</b><span><i class="coin"></i> ${fmt(C.eggs.gold)}</span><small>หายากขึ้นไปทุกใบ</small></div></button>
+    </div>
+    <div class="nest" id="nest"><div class="glow"></div><div class="bed"></div><div class="bigegg wobble" id="bigegg">${eggSVG(S.egg, true)}</div></div>
+    <button class="btn" id="hatchBtn" ${S.me.coins < price ? "disabled" : ""}>ฟักไข่ · <i class="coin"></i> ${fmt(price)}</button>
+    ${S.me.coins < price ? `<p class="muted" style="margin:-6px 0 0;text-align:center;font-size:14px">เหรียญไม่พอ — ไปออกสู้หรือรับรางวัลวันนี้ก่อน</p>` : ""}
+    <div><div class="muted" style="font-size:13px;margin-bottom:6px">โอกาสได้แต่ละระดับ</div><div class="odds">${odds}</div></div>
+    <div id="hatched"></div>`;
+  document.querySelectorAll("[data-egg]").forEach(b => b.onclick = () => { S.egg = b.dataset.egg; viewHatch(); });
+  $("#hatchBtn").onclick = hatch;
+}
+async function hatch() {
+  if (S.busy) return; S.busy = true;
+  const btn = $("#hatchBtn"), egg = $("#bigegg"); btn.disabled = true;
+  egg.classList.remove("wobble"); egg.classList.add("shake");
+  const t0 = Date.now();
+  try {
+    const d = await rpc("game_open_egg", { p_kind: S.egg });
+    await sleep(Math.max(0, (reduced ? 200 : 1100) - (Date.now() - t0)));
+    egg.classList.remove("shake"); egg.classList.add("cracking");
+    await sleep(reduced ? 50 : 450);
+    egg.classList.add("split");
+    await sleep(reduced ? 50 : 420);
+    S.me.coins = d.coins; S.mons.unshift(d.monster);
+    try { take(await rpc("game_me")); } catch (e) { }
+    S.busy = false; render();
+    showMon(d.monster, true);
+  } catch (e) {
+    S.busy = false; egg.classList.remove("shake"); egg.classList.add("wobble"); btn.disabled = false; toast(e.message, true);
+  }
+}
+function monBlock(m, fresh) {
+  const sp = spOf(m), q = quality(m);
+  return `<div class="reveal r${m.rarity}${fresh ? " burst" : ""}">
+    <div class="art">${monSVG(m)}</div>
+    <span class="rtag">${esc(rName(m.rarity))}</span>
+    <h3>${esc(sp.name)}</h3>
+    <div class="tid">#${esc(m.id)} · ธาตุ${esc(ELEM[sp.element].th)} · ชนะทาง${esc(ELEM[BEATS[sp.element]].th)}</div>
+    <div class="stats"><div><b class="num">${fmt(m.atk)}</b><span>โจมตี</span></div><div><b class="num">${fmt(m.hp)}</b><span>เลือด</span></div><div><b class="num">${fmt(m.spd)}</b><span>ความเร็ว</span></div></div>
+    <div class="quality">ความสมบูรณ์ ${q}% <div class="qbar"><i style="width:${q}%"></i></div></div>
+  </div>`;
+}
+
+/* ── แผ่นรายละเอียดตัว ── */
+function showMon(m, fresh) {
+  closeSheet();
+  const pos = inTeam(m.id), full = (S.me.team || []).length >= 3;
+  const wrap = document.createElement("div"); wrap.className = "scrim"; wrap.id = "scrim";
+  wrap.innerHTML = `<div class="sheet r${m.rarity}" role="dialog" aria-modal="true" aria-label="${esc(spOf(m).name)}">
+    ${monBlock(m, fresh)}
+    <div class="actions">
+      ${pos >= 0 ? `<button class="btn ghost" id="mTeam">เอาออกจากทีม</button>` : `<button class="btn" id="mTeam" ${full ? "disabled" : ""}>${full ? "ทีมเต็ม 3 ตัว" : "ใส่ทีม"}</button>`}
+      ${fresh ? `<button class="btn ghost" id="mAgain">ฟักอีกใบ</button>` : `<button class="btn ghost" id="mClose">ปิด</button>`}
+    </div>
+    ${pos < 0 && !fresh ? `<button class="btn ghost small" id="mRel" style="align-self:center">ปล่อยตัวนี้ (ไม่ได้เหรียญคืน)</button>` : ""}
+  </div>`;
+  document.body.appendChild(wrap);
+  wrap.onclick = e => { if (e.target === wrap) closeSheet(); };
+  const kb = e => { if (e.key === "Escape") closeSheet(); }; document.addEventListener("keydown", kb); wrap._kb = kb;
+  $("#mTeam").onclick = async () => {
+    const t = (S.me.team || []).map(Number).filter(x => x !== Number(m.id));
+    if (pos < 0) t.push(Number(m.id));
+    if (!t.length) { toast("ทีมต้องมีอย่างน้อย 1 ตัว", true); return; }
+    await setTeam(t); closeSheet(); render();
+  };
+  const ag = $("#mAgain"); if (ag) ag.onclick = () => { closeSheet(); S.tab = "hatch"; render(); setTimeout(hatch, 60); };
+  const cl = $("#mClose"); if (cl) cl.onclick = closeSheet;
+  const rl = $("#mRel"); if (rl) rl.onclick = async () => {
+    if (rl.dataset.sure !== "1") { rl.dataset.sure = "1"; rl.textContent = "กดอีกครั้งเพื่อปล่อย"; return; }
+    try { take(await rpc("game_release", { p_id: m.id })); closeSheet(); render(); toast("ปล่อยแล้ว"); } catch (e) { toast(e.message, true); }
+  };
+  setTimeout(() => { const f = wrap.querySelector(".btn:not(:disabled)"); if (f) f.focus(); }, 30);
+}
+function closeSheet() { const w = $("#scrim"); if (w) { document.removeEventListener("keydown", w._kb); w.remove(); } }
+async function setTeam(ids) {
+  try { const d = await rpc("game_set_team", { p_ids: ids }); S.me.team = d.team; } catch (e) { toast(e.message, true); }
+}
+
+/* ── กล่อง ── */
+function teamSlots(clickable) {
+  const t = (S.me.team || []).map(Number), byId = {}; S.mons.forEach(m => byId[m.id] = m);
+  return `<div class="team">${[0, 1, 2].map(i => {
+    const m = byId[t[i]];
+    return m ? `<button class="slot full r${m.rarity}" data-mid="${m.id}" ${clickable ? "" : "tabindex=-1"}>${monSVG(m)}<span>${esc(spOf(m).name)}</span></button>`
+             : `<div class="slot">ช่องว่าง<br>แตะตัวในกล่องเพื่อใส่</div>`;
+  }).join("")}</div>`;
+}
+function viewBox() {
+  const counts = [0, 0, 0, 0, 0, 0]; S.mons.forEach(m => { counts[m.rarity]++; counts[0]++; });
+  const list = S.mons.filter(m => !S.filter || m.rarity === S.filter);
+  const chips = [`<button data-f="0" aria-pressed="${S.filter === 0}">ทั้งหมด ${counts[0]}</button>`].concat(
+    S.cat.rarity.map(r => `<button data-f="${r.tier}" aria-pressed="${S.filter === r.tier}" class="r${r.tier}"><span style="color:${S.filter === r.tier ? "inherit" : "var(--rc)"}">${esc(r.name)}</span> ${counts[r.tier]}</button>`)).join("");
+  $("#view").innerHTML = `
+    <div class="row spread"><h2>ทีมของคุณ</h2><span class="muted" style="font-size:14px">พลังรวม ${fmt((S.me.team || []).map(Number).reduce((a, id) => { const m = S.mons.find(x => x.id == id); return a + (m ? power(m) : 0); }, 0))}</span></div>
+    ${teamSlots(true)}
+    <div class="row spread"><h2>กล่อง</h2><span class="muted num" style="font-size:14px">${S.mons.length} / ${S.cat.max_monsters}</span></div>
+    <div class="filters" role="group" aria-label="กรองตามระดับ">${chips}</div>
+    ${list.length ? `<div class="grid">${list.map(m => { const p = inTeam(m.id); return `<button class="card r${m.rarity}" data-mid="${m.id}">
+        ${p >= 0 ? `<span class="inteam" aria-label="อยู่ในทีม">${p + 1}</span>` : ""}
+        <div class="art">${monSVG(m)}</div><div class="nm">${esc(spOf(m).name)}</div><div class="st num">⚔ ${fmt(m.atk)} · ♥ ${fmt(m.hp)}</div></button>`; }).join("")}</div>`
+      : `<div class="empty">${S.mons.length ? "ไม่มีตัวระดับนี้" : "ยังไม่มีมอนสเตอร์ — ไปฟักไข่ใบแรกกัน"}</div>`}`;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.filter = +b.dataset.f; viewBox(); });
+  document.querySelectorAll("[data-mid]").forEach(b => b.onclick = () => { const m = S.mons.find(x => x.id == b.dataset.mid); if (m) showMon(m); });
+}
+
+/* ── ออกสู้ ── */
+function stageInfo(s) {
+  const n = s <= 2 ? 1 : s <= 5 ? 2 : 3, sc = s <= 5 ? 0.70 + 0.04 * (s - 1) : 1 + 0.07 * (s - 6);
+  let tier = 1; S.cat.rarity.forEach(r => { if (+r.mult <= sc * 1.05) tier = Math.max(tier, r.tier); });
+  const first = s > S.me.best_stage;
+  return { n, tier, reward: 10 + 3 * s + (first ? 30 + 10 * s : 0), first };
+}
+function viewFight() {
+  const maxS = S.me.best_stage + 1; S.stage = Math.min(Math.max(1, S.stage || maxS), maxS);
+  const I = stageInfo(S.stage), hasTeam = (S.me.team || []).length > 0;
+  $("#view").innerHTML = `
+    <h2>ออกสู้</h2>
+    <div class="stagebox">
+      <button class="step" id="sDown" aria-label="ด่านก่อนหน้า" ${S.stage <= 1 ? "disabled" : ""}>−</button>
+      <div class="n num">${S.stage}<small>${I.first ? "ด่านใหม่" : "ผ่านแล้ว — เล่นซ้ำได้"}</small></div>
+      <button class="step" id="sUp" aria-label="ด่านถัดไป" ${S.stage >= maxS ? "disabled" : ""}>+</button>
+    </div>
+    <div class="facts">
+      <div><span class="muted">ศัตรู</span><b>${I.n} ตัว · <span class="r${I.tier}" style="color:var(--rc)">${esc(rName(I.tier))}</span></b></div>
+      <div><span class="muted">ชนะได้</span><b><i class="coin"></i> ${fmt(I.reward)}</b>${I.first ? `<span class="muted" style="font-size:12px">รวมโบนัสผ่านครั้งแรก ${fmt(30 + 10 * S.stage)}</span>` : ""}</div>
+    </div>
+    ${teamSlots(false)}
+    <button class="btn" id="goFight" ${!hasTeam || S.me.energy < 1 ? "disabled" : ""}>${!hasTeam ? "จัดทีมในกล่องก่อน" : S.me.energy < 1 ? "พลังงานหมด รอสักครู่" : `ออกสู้ด่าน ${S.stage} · ใช้พลังงาน 1`}</button>
+    <p class="muted" style="font-size:13px;margin:0">ธาตุ: ไฟชนะไม้ · ไม้ชนะน้ำ · น้ำชนะไฟ · แสงกับมืดแรงใส่กัน (แรงขึ้น 1.5 เท่า)</p>
+    <div id="arenaHost"></div>`;
+  $("#sDown").onclick = () => { S.stage--; viewFight(); };
+  $("#sUp").onclick = () => { S.stage++; viewFight(); };
+  $("#goFight").onclick = fight;
+}
+function unitHTML(u, foe, i) {
+  return `<div class="unit${foe ? " foe" : ""} r${u.rarity}" id="${foe ? "e" : "p"}${i}">
+    <div class="art">${monSVG(u)}</div>
+    <div class="hp"><i style="width:100%"></i></div><div class="hpn num">${fmt(u.hp)} / ${fmt(u.hp)}</div></div>`;
+}
+async function fight() {
+  if (S.busy) return; S.busy = true;
+  const btn = $("#goFight"); btn.disabled = true;
+  let d;
+  try { d = await rpc("game_battle", { p_stage: S.stage }); }
+  catch (e) { S.busy = false; btn.disabled = false; toast(e.message, true); return; }
+  $("#view").innerHTML = `<h2>ด่าน ${fmt(d.stage)}</h2><div id="arenaHost"></div>`;
+  window.scrollTo(0, 0);
+  const host = $("#arenaHost");
+  host.innerHTML = `<div class="arena" id="arena">
+      <div class="vs"><span>ศัตรู · ด่าน ${d.stage}</span><span id="rnd">รอบ 1</span></div>
+      <div class="side">${d.enemies.map((u, i) => unitHTML(u, true, i)).join("")}</div>
+      <div class="side">${d.team.map((u, i) => unitHTML(u, false, i)).join("")}</div>
+      <div class="vs"><span>ทีมคุณ</span><span><button class="btn ghost small" id="fast">เร็ว ×2</button> <button class="btn ghost small" id="skip">ข้าม</button></span></div>
+    </div>`;
+  let speed = 1, skip = false;
+  $("#fast").onclick = e => { speed = speed === 1 ? 2.2 : 1; e.target.textContent = speed === 1 ? "เร็ว ×2" : "ปกติ"; };
+  $("#skip").onclick = () => { skip = true; };
+  const maxHp = { p: d.team.map(u => u.hp), e: d.enemies.map(u => u.hp) };
+  const setHp = (side, i, hp) => {
+    const el = $("#" + side + i); if (!el) return;
+    el.querySelector(".hp i").style.width = Math.max(0, hp / maxHp[side][i] * 100) + "%";
+    el.querySelector(".hpn").textContent = `${fmt(hp)} / ${fmt(maxHp[side][i])}`;
+    el.classList.toggle("dead", hp <= 0);
+  };
+  for (const [r, side, a, t, dmg, fl, hp] of d.log) {
+    const tside = side === "p" ? "e" : "p";
+    if (skip) { setHp(tside, t, hp); continue; }
+    $("#rnd").textContent = "รอบ " + r;
+    const at = $("#" + side + a), tg = $("#" + tside + t);
+    if (at && !reduced) at.classList.add(side === "p" ? "lunge-up" : "lunge-down");
+    await sleep(170 / speed);
+    if (at) at.classList.remove("lunge-up", "lunge-down");
+    if (tg) {
+      tg.classList.remove("hit"); void tg.offsetWidth; tg.classList.add("hit");
+      const pop = document.createElement("span");
+      pop.className = "pop" + (fl & 1 ? " crit" : "") + (fl & 2 ? " strong" : "") + (fl & 4 ? " weak" : "");
+      pop.textContent = "-" + fmt(dmg) + (fl & 1 ? " คริ!" : fl & 2 ? " แรง!" : "");
+      tg.appendChild(pop); setTimeout(() => pop.remove(), 900);
+    }
+    setHp(tside, t, hp);
+    await sleep(380 / speed);
+  }
+  const ban = document.createElement("div");
+  ban.className = "banner " + (d.win ? "win" : "lose");
+  ban.innerHTML = d.win
+    ? `<h3>ชนะ!</h3><div>ได้ <i class="coin"></i> <b class="num">${fmt(d.reward)}</b>${d.first ? " · ผ่านด่าน " + d.stage + " ครั้งแรก" : ""}</div>`
+    : `<h3>แพ้</h3><div class="muted">ศัตรูแรงไป ลองจัดทีมใหม่ เลือกธาตุที่ชนะทาง หรือฟักตัวที่แรงกว่านี้</div>`;
+  ban.innerHTML += `<div class="actions" style="width:100%;max-width:320px"><button class="btn" id="again">${d.win && d.first ? "ด่านถัดไป" : "สู้อีกครั้ง"}</button><button class="btn ghost" id="back">กลับ</button></div>`;
+  $("#arena").appendChild(ban);
+  take(d);
+  if (d.win && d.first) S.stage = d.stage + 1;
+  S.busy = false;
+  $("#again").onclick = () => { render(); setTimeout(() => { const b = $("#goFight"); if (b && !b.disabled) fight(); }, 30); };
+  $("#back").onclick = () => render();
+  $("#again").focus();
+  // อัปเดตแถบบน (เหรียญ/พลังงาน) โดยไม่ล้างสนาม
+  const chip = document.querySelector(".top .chip"); if (chip) chip.innerHTML = `<i class="coin"></i>${fmt(S.me.coins)}`;
+  document.querySelectorAll(".pip").forEach((p, i) => p.classList.toggle("on", i < S.me.energy));
+}
+
+/* ── อันดับ ── */
+async function viewRank() {
+  $("#view").innerHTML = `<div class="row spread"><h2>อันดับ</h2><button class="btn ghost small" id="rf">โหลดใหม่</button></div><div class="board" id="board"><div class="muted">กำลังโหลด…</div></div>`;
+  $("#rf").onclick = viewRank;
+  try {
+    const d = await rpc("game_leaderboard");
+    if (S.tab !== "rank") return;
+    const rows = (d.top || []).map(x => `<div class="lb${x.me ? " me" : ""}"><div class="rk num">${x.rank}</div>
+      <div style="min-width:0"><div class="nm">${esc(x.name)}${x.me ? " (คุณ)" : ""}</div><div class="sub">ชนะ ${fmt(x.wins)} · มี ${fmt(x.total)} ตัว${x.mythic ? ` · <span class="r5" style="color:var(--rc)">เทพ ${fmt(x.mythic)}</span>` : ""}</div></div>
+      <div class="stg num">${fmt(x.best_stage)}<small>ด่าน</small></div></div>`).join("");
+    const meOut = d.me && !(d.top || []).some(x => x.me) ? `<div class="muted" style="text-align:center;font-size:14px">คุณอยู่อันดับ ${fmt(d.me.rank)} จาก ${fmt(d.players)} คน</div>` : "";
+    $("#board").innerHTML = (rows || `<div class="empty">ยังไม่มีผู้เล่น</div>`) + meOut;
+  } catch (e) { $("#board").innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+/* ── รางวัลรายวัน ── */
+async function claimDaily() {
+  if (!S.me.daily_ready) { toast("วันนี้รับรางวัลไปแล้ว พรุ่งนี้มาใหม่"); return; }
+  try {
+    const d = await rpc("game_daily"); take(d); render();
+    toast(`รับ ${fmt(d.reward)} เหรียญ · เข้าเล่นติดกัน ${d.streak} วัน`);
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ═══════════ เริ่มเกม ═══════════ */
+function welcome(msg) {
+  $("#nav").classList.add("hidden");
+  $("#app").innerHTML = `<section class="welcome">
+    <div class="bigegg wobble" style="width:130px;height:160px;margin:0">${eggSVG("gold")}</div>
+    <h1>Monster Egg</h1>
+    <p>ฟักไข่ สะสมมอนสเตอร์ ยิ่งแรร์ยิ่งตีแรง เลือดถึก แล้วพาทีมไต่ด่าน</p>
+    <form id="startForm" novalidate>
+      <label for="pname" class="muted" style="font-size:14px">ตั้งชื่อผู้เล่น</label>
+      <input class="field" id="pname" maxlength="16" autocomplete="nickname" placeholder="เช่น นักฟักไข่" required>
+      <div class="err" id="err" role="alert">${esc(msg || "")}</div>
+      <button class="btn" type="submit" id="startBtn">เริ่มเล่น · รับ 300 เหรียญ</button>
+    </form>
+    <p class="note">บัญชีผูกกับเบราว์เซอร์นี้ ถ้าล้างข้อมูลเบราว์เซอร์ ตัวมอนสเตอร์จะหาย</p>
+  </section>`;
+  $("#startForm").onsubmit = async e => {
+    e.preventDefault();
+    const name = $("#pname").value.trim(), btn = $("#startBtn"), err = $("#err");
+    if (name.length < 2) { err.textContent = "ชื่อต้องยาวอย่างน้อย 2 ตัวอักษร"; return; }
+    btn.disabled = true; err.textContent = "";
+    try {
+      const { data } = await sb.auth.getSession();
+      if (!data.session) {
+        const r = await sb.auth.signInAnonymously();
+        if (r.error) throw new Error(/anonymous/i.test(r.error.message || "") ? "เซิร์ฟเวอร์ยังไม่เปิดให้เล่นแบบไม่ต้องสมัคร (เจ้าของเกมต้องเปิด Allow anonymous sign-ins ใน Supabase)" : (r.error.message || "ล็อกอินไม่ได้"));
+      }
+      take(await rpc("game_start", { p_name: name }));
+      S.tab = "hatch"; render();
+      toast("ได้ 300 เหรียญ ลองฟักไข่ใบแรกเลย");
+    } catch (x) { err.textContent = x.message; btn.disabled = false; }
+  };
+  setTimeout(() => { const f = $("#pname"); if (f) f.focus(); }, 50);
+}
+async function boot() {
+  if (!window.supabase) { $("#app").innerHTML = `<div class="loading">โหลดตัวเชื่อมเซิร์ฟเวอร์ไม่ได้ — ตรวจอินเทอร์เน็ตแล้วรีเฟรช</div>`; return; }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "monster-egg-auth" } });
+  document.querySelectorAll("#nav button").forEach(b => b.onclick = () => { if (S.busy) return; S.tab = b.dataset.tab; closeSheet(); render(); window.scrollTo(0, 0); });
+  try {
+    const { data } = await sb.auth.getSession();
+    if (!data.session) return welcome();
+    const d = await rpc("game_me"); take(d);
+    if (!S.me) return welcome();
+    render();
+  } catch (e) { welcome(e.message); }
+}
+boot();
+</script>
+</body>
+</html>
