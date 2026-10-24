@@ -15,7 +15,8 @@
   --night:#1E1B3A; --night-2:#2A2552; --night-3:#3A3470; --line:#4A438A;
   --shell:#FFF4DC; --mist:#B7B0E6; --dim:#8780BF;
   --yolk:#FFC93C; --yolk-ink:#3A2A00; --bad:#FF7A7A; --good:#5BE3A8;
-  --r1:#A3A9BF; --r2:#43D69C; --r3:#9C8CFF; --r4:#FFB31F; --r5:#FF5FA2;
+  --r1:#9AA0B5; --r2:#6EC6FF; --r3:#43D69C; --r4:#9C8CFF; --r5:#FFB31F; --r6:#FF5FA2; --r7:#FFE07A;
+  --rainbow:linear-gradient(135deg,#FF5FA2,#FFC93C 30%,#43D69C 55%,#5AB8FF 75%,#9C8CFF);
   --display:"Itim", "IBM Plex Sans Thai Looped", system-ui, sans-serif;
   --body:"IBM Plex Sans Thai Looped", system-ui, sans-serif;
   --nav-h:68px;
@@ -124,8 +125,14 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 .odds i{font-style:normal;font-weight:600}
 
 /* ── การ์ดมอนสเตอร์ ── */
-.r1{--rc:var(--r1)} .r2{--rc:var(--r2)} .r3{--rc:var(--r3)} .r4{--rc:var(--r4)} .r5{--rc:var(--r5)}
-.rtag{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;color:#1B1838;background:var(--rc)}
+.r1{--rc:var(--r1)} .r2{--rc:var(--r2)} .r3{--rc:var(--r3)} .r4{--rc:var(--r4)} .r5{--rc:var(--r5)} .r6{--rc:var(--r6)} .r7{--rc:var(--r7)}
+/* ป้ายเกรด D C B A S SS SSR */
+.grade{position:absolute;top:6px;right:6px;z-index:2;min-width:28px;height:28px;padding:0 6px;border-radius:9px;background:var(--rc);color:#1B1838;font-family:var(--display);font-size:18px;line-height:28px;text-align:center;box-shadow:0 2px 0 #0005}
+.r7 .grade,.grade.r7{background:var(--rainbow)}
+.grade.big{position:static;min-width:58px;height:50px;line-height:50px;font-size:34px;border-radius:14px;padding:0 12px}
+.slot .grade{top:4px;right:4px;transform:scale(.85);transform-origin:top right}
+.unit .grade{top:0;right:10%;transform:scale(.8);transform-origin:top right}
+.rtag{display:none;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;color:#1B1838;background:var(--rc)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
 .card{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 6px 8px;border-radius:16px;background:var(--night-2);border:2px solid var(--rc);text-align:center;min-width:0}
 .card .art{width:100%;aspect-ratio:1;border-radius:12px;background:radial-gradient(circle at 50% 60%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
@@ -133,9 +140,9 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 .card .nm{font-family:var(--display);font-size:17px;line-height:1.1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .card .st{font-size:12px;color:var(--mist)}
 .card .inteam{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:var(--yolk);color:var(--yolk-ink);font-size:12px;font-weight:600;display:grid;place-items:center}
-.r5.card,.r5.reveal{border-color:transparent;background:linear-gradient(var(--night-2),var(--night-2)) padding-box,conic-gradient(from var(--ang,0deg),#FF5FA2,#FFC93C,#43D69C,#5AB8FF,#9C8CFF,#FF5FA2) border-box}
+.r7.card,.r7.reveal{border-color:transparent;background:linear-gradient(var(--night-2),var(--night-2)) padding-box,conic-gradient(from var(--ang,0deg),#FF5FA2,#FFC93C,#43D69C,#5AB8FF,#9C8CFF,#FF5FA2) border-box}
 @property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
-.r5.card,.r5.reveal{animation:spin 4s linear infinite}
+.r7.card,.r7.reveal{animation:spin 4s linear infinite}
 @keyframes spin{to{--ang:360deg}}
 
 .reveal{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:22px;background:var(--night-2);border:3px solid var(--rc);text-align:center}
@@ -156,9 +163,9 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 /* ── ทีม ── */
 .team{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .slot{min-height:120px;border-radius:16px;border:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;color:var(--dim);padding:6px;text-align:center}
-.slot.full{border-style:solid;border-color:var(--rc);background:var(--night-2);color:var(--shell)}
+.slot.full{position:relative;border-style:solid;border-color:var(--rc);background:var(--night-2);color:var(--shell)}
 .slot svg{width:72px;height:72px}
-.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
 .filters button{flex:none;padding:4px 12px;border-radius:999px;border:1px solid var(--line);font-size:14px;background:var(--night-2)}
 .filters button[aria-pressed="true"]{background:var(--shell);color:var(--night);border-color:var(--shell)}
 .empty{padding:28px 12px;text-align:center;color:var(--mist);border:2px dashed var(--line);border-radius:18px}
@@ -179,29 +186,37 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
 .facts div{background:var(--night-2);border-radius:14px;padding:8px 12px}
 .facts b{display:block;font-size:18px}
-.arena{display:flex;flex-direction:column;gap:10px;background:radial-gradient(120% 80% at 50% 50%,#2C2560,#1B1838);border-radius:22px;padding:12px;border:1px solid var(--line);position:relative;overflow:hidden}
-.side{display:flex;justify-content:center;gap:6px}
-.side .unit{flex:0 1 33.3%;min-width:0}
-.unit{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .18s, opacity .3s}
-.unit .art{width:84px;height:84px}
-.unit .art svg{width:100%;height:100%}
-.unit .hp{width:88%;height:9px;border-radius:99px;background:#110E26;overflow:hidden;border:1px solid #0006}
-.unit .hp i{display:block;height:100%;background:var(--good);transition:width .25s}
-.unit.foe .hp i{background:var(--bad)}
-.unit .hpn{font-size:11px;color:var(--mist)}
-.unit.dead{opacity:.25;filter:grayscale(1)}
-.unit.hit .art{animation:hit .25s}
-@keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.unit.lunge-up{transform:translateY(-18px)}
-.unit.lunge-down{transform:translateY(18px)}
-.pop{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:24px;color:#fff;text-shadow:0 2px 0 #0008;pointer-events:none;animation:float .8s ease-out forwards;white-space:nowrap}
-.pop.crit{font-size:30px;color:var(--yolk)}
-.pop.weak{color:var(--mist);font-size:20px}
-.pop.strong{color:var(--good)}
-@keyframes float{from{transform:translate(-50%,0);opacity:1}to{transform:translate(-50%,-34px);opacity:0}}
-.vs{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mist)}
-.banner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#120F2Bd9;text-align:center;padding:16px;animation:burst .4s ease-out}
-.banner h3{font-size:48px}
+/* ── ฉากสู้ 2D (เล่นตามผลจากเซิร์ฟเวอร์อัตโนมัติ) ── */
+.stage2d{position:relative;width:100%;aspect-ratio:4/3;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#1B1838;isolation:isolate}
+.stage2d .bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;left:8px;right:8px;top:8px;z-index:150;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.hud span{background:#120F2Bb3;border-radius:999px;padding:2px 10px;font-size:13px;color:var(--shell)}
+.fighter{position:absolute;width:19%;transform:translate(-50%,-100%)}
+.fighter .mover{position:relative}
+.fighter .body{width:100%;aspect-ratio:1;animation:bob 1.7s ease-in-out infinite}
+.fighter .body svg{width:100%;height:100%;display:block}
+.fighter .body.flip svg{transform:scaleX(-1)}
+@keyframes bob{50%{transform:translateY(-4%)}}
+.fighter .hpw{position:absolute;left:8%;right:8%;top:-6%;display:flex;align-items:center;gap:3px;z-index:2}
+.fighter .hpw .grade{position:static;min-width:0;height:16px;line-height:16px;font-size:12px;padding:0 4px;border-radius:5px;box-shadow:none;flex:none}
+.fighter .hp{flex:1;height:7px;border-radius:99px;background:#110E26cc;overflow:hidden;border:1px solid #0008}
+.fighter .hp i{display:block;width:100%;height:100%;background:var(--good);transition:width .25s}
+.fighter.e .hp i{background:var(--bad)}
+.fighter.ko .body{animation:none;filter:grayscale(1)}
+.fighter.ko .hpw{opacity:0}
+.fx{position:absolute;left:0;top:0;width:9%;aspect-ratio:1;pointer-events:none;z-index:120}
+.fx svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 4px #fff8)}
+.ring{position:absolute;left:0;top:0;width:15%;aspect-ratio:1;border-radius:50%;border:3px solid var(--fxc,#fff);pointer-events:none;z-index:121}
+.pop{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:130;font-family:var(--display);font-size:22px;color:#fff;text-shadow:0 2px 0 #000a,0 0 6px #0008;pointer-events:none;animation:float .9s ease-out forwards;white-space:nowrap}
+.pop.crit{font-size:28px;color:var(--yolk)}
+.pop.weak{color:#D6D1F5;font-size:18px}
+.pop.strong{color:#7CF5BF}
+@keyframes float{from{transform:translate(-50%,0);opacity:1}to{transform:translate(-50%,-30px);opacity:0}}
+.callout{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:160;font-family:var(--display);font-size:44px;color:var(--yolk);text-shadow:0 3px 0 #0009;pointer-events:none}
+.ctrl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--mist)}
+.ctrl .btn{min-width:64px}
+.banner{position:absolute;inset:0;z-index:170;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#120F2Bb8;text-align:center;padding:16px;animation:burst .4s ease-out}
+.banner h3{font-size:52px}
 .banner.win h3{color:var(--yolk)}
 .banner.lose h3{color:var(--mist)}
 
@@ -316,7 +331,7 @@ function monSVG(m) {
   let s = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(sp.name || "มอนสเตอร์")}"><defs>`
     + `<radialGradient id="${id}b" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="${belly}" stop-opacity=".55"/><stop offset=".45" stop-color="${body}"/><stop offset="1" stop-color="${shade}"/></radialGradient>`
     + `<radialGradient id="${id}a" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
-  if (m.rarity >= 5) s += `<circle cx="60" cy="64" r="56" fill="url(#${id}a)"/>`;
+  if (m.rarity >= 7) s += `<circle cx="60" cy="64" r="56" fill="url(#${id}a)"/>`;
   s += `<ellipse cx="60" cy="${(cy + ry + 6).toFixed(1)}" rx="${(rx * 0.8).toFixed(1)}" ry="5" fill="#000" opacity=".25"/>`;
   // ของประจำธาตุด้านหลัง/บนหัว
   if (el === "fire") {
@@ -355,10 +370,10 @@ function monSVG(m) {
   else s += `<path d="M${cx - 9},${my} q9,6 18,0" stroke="#2A1A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M${cx - 6},${my + 1.5} l2,5 l2,-4.5z M${cx + 6},${my + 1.5} l-2,5 l-2,-4.5z" fill="#fff"/>`;
   if (R() < 0.55) s += `<ellipse cx="${cx - 21}" cy="${my - 3}" rx="5" ry="3" fill="#FF8FA3" opacity=".55"/><ellipse cx="${cx + 21}" cy="${my - 3}" rx="5" ry="3" fill="#FF8FA3" opacity=".55"/>`;
   if (el === "light") s += `<path d="M${cx + rx - 4},${top + 6} l2,-6 l2,6 l6,2 l-6,2 l-2,6 l-2,-6 l-6,-2z" fill="#FFF3B0"/>`;
-  // ระดับสูง: มงกุฎ (ตำนาน) · ประกาย (เทพ)
-  if (m.rarity === 4) s += `<path d="M${cx - 13},${top + 2} l3,-13 l6,7 l4,-10 l4,10 l6,-7 l3,13 z" fill="#FFC93C" stroke="#B87F0B" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
-  if (m.rarity >= 5) {
-    s += `<path d="M${cx - 15},${top + 1} l3,-14 l6,7 l4,-11 l4,11 l6,-7 l3,14 z" fill="#FFE07A" stroke="#FF5FA2" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
+  // เกรดสูง: S / SS มงกุฎทอง · SS ขึ้นไปมีประกาย · SSR มงกุฎชมพูทอง + รัศมี
+  if (m.rarity === 5 || m.rarity === 6) s += `<path d="M${cx - 13},${top + 2} l3,-13 l6,7 l4,-10 l4,10 l6,-7 l3,13 z" fill="#FFC93C" stroke="#B87F0B" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
+  if (m.rarity >= 7) s += `<path d="M${cx - 15},${top + 1} l3,-14 l6,7 l4,-11 l4,11 l6,-7 l3,14 z" fill="#FFE07A" stroke="#FF5FA2" stroke-width="1.5" transform="rotate(-12 ${cx} ${top})"/>`;
+  if (m.rarity >= 6) {
     [[16, 22], [102, 30], [98, 96], [20, 92]].forEach(([x, y], i) => { const k = i % 2 ? 4 : 6; s += `<path d="M${x},${y - k} l${k * 0.3},${k * 0.7} l${k * 0.7},${k * 0.3} l-${k * 0.7},${k * 0.3} l-${k * 0.3},${k * 0.7} l-${k * 0.3},-${k * 0.7} l-${k * 0.7},-${k * 0.3} l${k * 0.7},-${k * 0.3}z" fill="#FFF3B0"/>`; });
   }
   return s + "</svg>";
@@ -385,6 +400,7 @@ function eggSVG(kind, crackable) {
 /* ── ข้อมูลตัว ── */
 const spOf = m => (S.cat && S.cat.sp[m.species]) || { name: "?", element: "fire", atk: 1, hp: 1 };
 const rName = t => (S.cat && S.cat.rr[t] && S.cat.rr[t].name) || "";
+const gradeTag = (t, big) => `<span class="grade r${t}${big ? " big" : ""}" aria-label="เกรด ${esc(rName(t))}">${esc(rName(t))}</span>`;
 const power = m => m.atk * 4 + m.hp;
 function quality(m) {
   const sp = spOf(m), mult = +((S.cat && S.cat.rr[m.rarity] && S.cat.rr[m.rarity].mult) || 1);
@@ -423,7 +439,7 @@ function tick() {
 }
 setInterval(async () => {
   tick();
-  if (S.me && S.nextAt && Date.now() > S.nextAt + 1500 && !S.busy && !$(".arena")) {
+  if (S.me && S.nextAt && Date.now() > S.nextAt + 1500 && !S.busy && !$("#stage")) {
     S.nextAt = 0;
     try { take(await rpc("game_me")); render(); } catch (e) { }
   }
@@ -436,12 +452,12 @@ function viewHatch() {
   $("#view").innerHTML = `
     <div class="eggpick" role="group" aria-label="เลือกไข่">
       <button data-egg="normal" aria-pressed="${S.egg === "normal"}">${eggSVG("normal")}<div><b>ไข่ธรรมดา</b><span><i class="coin"></i> ${fmt(C.eggs.normal)}</span></div></button>
-      <button data-egg="gold" aria-pressed="${S.egg === "gold"}">${eggSVG("gold")}<div><b>ไข่ทอง</b><span><i class="coin"></i> ${fmt(C.eggs.gold)}</span><small>หายากขึ้นไปทุกใบ</small></div></button>
+      <button data-egg="gold" aria-pressed="${S.egg === "gold"}">${eggSVG("gold")}<div><b>ไข่ทอง</b><span><i class="coin"></i> ${fmt(C.eggs.gold)}</span><small>เกรด B ขึ้นไปทุกใบ</small></div></button>
     </div>
     <div class="nest" id="nest"><div class="glow"></div><div class="bed"></div><div class="bigegg wobble" id="bigegg">${eggSVG(S.egg, true)}</div></div>
     <button class="btn" id="hatchBtn" ${S.me.coins < price ? "disabled" : ""}>ฟักไข่ · <i class="coin"></i> ${fmt(price)}</button>
     ${S.me.coins < price ? `<p class="muted" style="margin:-6px 0 0;text-align:center;font-size:14px">เหรียญไม่พอ — ไปออกสู้หรือรับรางวัลวันนี้ก่อน</p>` : ""}
-    <div><div class="muted" style="font-size:13px;margin-bottom:6px">โอกาสได้แต่ละระดับ</div><div class="odds">${odds}</div></div>
+    <div><div class="muted" style="font-size:13px;margin-bottom:6px">โอกาสได้แต่ละเกรด</div><div class="odds">${odds}</div></div>
     <div id="hatched"></div>`;
   document.querySelectorAll("[data-egg]").forEach(b => b.onclick = () => { S.egg = b.dataset.egg; viewHatch(); });
   $("#hatchBtn").onclick = hatch;
@@ -470,7 +486,7 @@ function monBlock(m, fresh) {
   const sp = spOf(m), q = quality(m);
   return `<div class="reveal r${m.rarity}${fresh ? " burst" : ""}">
     <div class="art">${monSVG(m)}</div>
-    <span class="rtag">${esc(rName(m.rarity))}</span>
+    ${gradeTag(m.rarity, true)}
     <h3>${esc(sp.name)}</h3>
     <div class="tid">#${esc(m.id)} · ธาตุ${esc(ELEM[sp.element].th)} · ชนะทาง${esc(ELEM[BEATS[sp.element]].th)}</div>
     <div class="stats"><div><b class="num">${fmt(m.atk)}</b><span>โจมตี</span></div><div><b class="num">${fmt(m.hp)}</b><span>เลือด</span></div><div><b class="num">${fmt(m.spd)}</b><span>ความเร็ว</span></div></div>
@@ -481,12 +497,15 @@ function monBlock(m, fresh) {
 /* ── แผ่นรายละเอียดตัว ── */
 function showMon(m, fresh) {
   closeSheet();
-  const pos = inTeam(m.id), full = (S.me.team || []).length >= 3;
+  const pos = inTeam(m.id), team = (S.me.team || []).map(Number), full = team.length >= 3;
+  // ทีมเต็ม: เสนอสลับแทนตัวที่พลังต่ำสุดในทีม
+  const weak = (pos < 0 && full) ? team.map(id => S.mons.find(x => Number(x.id) === id)).filter(Boolean).sort((a, b) => power(a) - power(b))[0] : null;
   const wrap = document.createElement("div"); wrap.className = "scrim"; wrap.id = "scrim";
   wrap.innerHTML = `<div class="sheet r${m.rarity}" role="dialog" aria-modal="true" aria-label="${esc(spOf(m).name)}">
     ${monBlock(m, fresh)}
     <div class="actions">
-      ${pos >= 0 ? `<button class="btn ghost" id="mTeam">เอาออกจากทีม</button>` : `<button class="btn" id="mTeam" ${full ? "disabled" : ""}>${full ? "ทีมเต็ม 3 ตัว" : "ใส่ทีม"}</button>`}
+      ${pos >= 0 ? `<button class="btn ghost" id="mTeam">เอาออกจากทีม</button>`
+        : `<button class="btn" id="mTeam" ${full && !weak ? "disabled" : ""}>${!full ? "ใส่ทีม" : weak ? `แทน ${esc(spOf(weak).name)} (${esc(rName(weak.rarity))})` : "ทีมเต็ม 3 ตัว"}</button>`}
       ${fresh ? `<button class="btn ghost" id="mAgain">ฟักอีกใบ</button>` : `<button class="btn ghost" id="mClose">ปิด</button>`}
     </div>
     ${pos < 0 && !fresh ? `<button class="btn ghost small" id="mRel" style="align-self:center">ปล่อยตัวนี้ (ไม่ได้เหรียญคืน)</button>` : ""}
@@ -495,8 +514,8 @@ function showMon(m, fresh) {
   wrap.onclick = e => { if (e.target === wrap) closeSheet(); };
   const kb = e => { if (e.key === "Escape") closeSheet(); }; document.addEventListener("keydown", kb); wrap._kb = kb;
   $("#mTeam").onclick = async () => {
-    const t = (S.me.team || []).map(Number).filter(x => x !== Number(m.id));
-    if (pos < 0) t.push(Number(m.id));
+    let t = team.filter(x => x !== Number(m.id));
+    if (pos < 0) t = weak ? team.map(x => x === Number(weak.id) ? Number(m.id) : x) : t.concat(Number(m.id));
     if (!t.length) { toast("ทีมต้องมีอย่างน้อย 1 ตัว", true); return; }
     await setTeam(t); closeSheet(); render();
   };
@@ -518,24 +537,24 @@ function teamSlots(clickable) {
   const t = (S.me.team || []).map(Number), byId = {}; S.mons.forEach(m => byId[m.id] = m);
   return `<div class="team">${[0, 1, 2].map(i => {
     const m = byId[t[i]];
-    return m ? `<button class="slot full r${m.rarity}" data-mid="${m.id}" ${clickable ? "" : "tabindex=-1"}>${monSVG(m)}<span>${esc(spOf(m).name)}</span></button>`
+    return m ? `<button class="slot full r${m.rarity}" data-mid="${m.id}" ${clickable ? "" : "tabindex=-1"}>${gradeTag(m.rarity)}${monSVG(m)}<span>${esc(spOf(m).name)}</span></button>`
              : `<div class="slot">ช่องว่าง<br>แตะตัวในกล่องเพื่อใส่</div>`;
   }).join("")}</div>`;
 }
 function viewBox() {
-  const counts = [0, 0, 0, 0, 0, 0]; S.mons.forEach(m => { counts[m.rarity]++; counts[0]++; });
+  const counts = new Array(8).fill(0); S.mons.forEach(m => { counts[m.rarity]++; counts[0]++; });
   const list = S.mons.filter(m => !S.filter || m.rarity === S.filter);
   const chips = [`<button data-f="0" aria-pressed="${S.filter === 0}">ทั้งหมด ${counts[0]}</button>`].concat(
-    S.cat.rarity.map(r => `<button data-f="${r.tier}" aria-pressed="${S.filter === r.tier}" class="r${r.tier}"><span style="color:${S.filter === r.tier ? "inherit" : "var(--rc)"}">${esc(r.name)}</span> ${counts[r.tier]}</button>`)).join("");
+    S.cat.rarity.map(r => `<button data-f="${r.tier}" aria-pressed="${S.filter === r.tier}" class="r${r.tier}" aria-label="เกรด ${esc(r.name)} ${counts[r.tier]} ตัว"><span style="color:${S.filter === r.tier ? "inherit" : "var(--rc)"};font-family:var(--display);font-size:16px">${esc(r.name)}</span> ${counts[r.tier]}</button>`)).join("");
   $("#view").innerHTML = `
     <div class="row spread"><h2>ทีมของคุณ</h2><span class="muted" style="font-size:14px">พลังรวม ${fmt((S.me.team || []).map(Number).reduce((a, id) => { const m = S.mons.find(x => x.id == id); return a + (m ? power(m) : 0); }, 0))}</span></div>
     ${teamSlots(true)}
     <div class="row spread"><h2>กล่อง</h2><span class="muted num" style="font-size:14px">${S.mons.length} / ${S.cat.max_monsters}</span></div>
-    <div class="filters" role="group" aria-label="กรองตามระดับ">${chips}</div>
+    <div class="filters" role="group" aria-label="กรองตามเกรด">${chips}</div>
     ${list.length ? `<div class="grid">${list.map(m => { const p = inTeam(m.id); return `<button class="card r${m.rarity}" data-mid="${m.id}">
-        ${p >= 0 ? `<span class="inteam" aria-label="อยู่ในทีม">${p + 1}</span>` : ""}
+        ${p >= 0 ? `<span class="inteam" aria-label="อยู่ในทีม">${p + 1}</span>` : ""}${gradeTag(m.rarity)}
         <div class="art">${monSVG(m)}</div><div class="nm">${esc(spOf(m).name)}</div><div class="st num">⚔ ${fmt(m.atk)} · ♥ ${fmt(m.hp)}</div></button>`; }).join("")}</div>`
-      : `<div class="empty">${S.mons.length ? "ไม่มีตัวระดับนี้" : "ยังไม่มีมอนสเตอร์ — ไปฟักไข่ใบแรกกัน"}</div>`}`;
+      : `<div class="empty">${S.mons.length ? "ไม่มีตัวเกรดนี้" : "ยังไม่มีมอนสเตอร์ — ไปฟักไข่ใบแรกกัน"}</div>`}`;
   document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.filter = +b.dataset.f; viewBox(); });
   document.querySelectorAll("[data-mid]").forEach(b => b.onclick = () => { const m = S.mons.find(x => x.id == b.dataset.mid); if (m) showMon(m); });
 }
@@ -558,7 +577,7 @@ function viewFight() {
       <button class="step" id="sUp" aria-label="ด่านถัดไป" ${S.stage >= maxS ? "disabled" : ""}>+</button>
     </div>
     <div class="facts">
-      <div><span class="muted">ศัตรู</span><b>${I.n} ตัว · <span class="r${I.tier}" style="color:var(--rc)">${esc(rName(I.tier))}</span></b></div>
+      <div><span class="muted">ศัตรู</span><b>${I.n} ตัว · เกรด <span class="r${I.tier}" style="color:var(--rc)">${esc(rName(I.tier))}</span></b></div>
       <div><span class="muted">ชนะได้</span><b><i class="coin"></i> ${fmt(I.reward)}</b>${I.first ? `<span class="muted" style="font-size:12px">รวมโบนัสผ่านครั้งแรก ${fmt(30 + 10 * S.stage)}</span>` : ""}</div>
     </div>
     ${teamSlots(false)}
@@ -569,68 +588,144 @@ function viewFight() {
   $("#sUp").onclick = () => { S.stage++; viewFight(); };
   $("#goFight").onclick = fight;
 }
-function unitHTML(u, foe, i) {
-  return `<div class="unit${foe ? " foe" : ""} r${u.rarity}" id="${foe ? "e" : "p"}${i}">
-    <div class="art">${monSVG(u)}</div>
-    <div class="hp"><i style="width:100%"></i></div><div class="hpn num">${fmt(u.hp)} / ${fmt(u.hp)}</div></div>`;
+/* ═══════════ ฉากสู้ 2D อัตโนมัติ ═══════════
+   เซิร์ฟเวอร์คิดผลเสร็จแล้ว (game_battle ส่งบันทึกการตีทุกครั้งมา) — หน้านี้แค่เล่นภาพตามบันทึก จึงกันโกงเหมือนเดิม
+   ฉากเปลี่ยนทุก 5 ด่าน: ทุ่งหญ้า → ภูเขาไฟ → ชายทะเล → ปราสาทมืด แล้ววนใหม่ */
+const THEMES = [
+  { name: "ทุ่งหญ้า", sky: ["#34408F", "#9A86E0"], far: "#2F5E66", near: "#2D6A55", g: ["#3F8F5F", "#24563A"], orb: "#FFE7A3" },
+  { name: "ภูเขาไฟ", sky: ["#2E1230", "#B44A2E"], far: "#3A1D2A", near: "#2A1520", g: ["#5A2E22", "#2B1511"], orb: "#FF9A3C" },
+  { name: "ชายทะเล", sky: ["#1E3C7A", "#55B6D8"], far: "#1F6390", near: "#2A7FB0", g: ["#D9B977", "#9C7F4A"], orb: "#FFF4C8" },
+  { name: "ปราสาทมืด", sky: ["#0E0B24", "#3A2E6E"], far: "#231C46", near: "#1A1538", g: ["#2C2652", "#15122E"], orb: "#E8E4FF" },
+];
+const FXC = { fire: "#FF8A3C", water: "#5AB8FF", leaf: "#6BD27A", light: "#FFE07A", dark: "#B07CFF" };
+const LAYOUT = { 1: [[30, 88]], 2: [[33, 83], [17, 96]], 3: [[36, 87], [17, 77], [19, 98]] };   // [x%, y% ของเท้า] ฝั่งซ้าย · ศัตรูกลับด้าน
+const themeOf = s => THEMES[Math.floor((s - 1) / 5) % THEMES.length];
+function stageBG(th) {
+  const id = "s" + (++gid);
+  let extra = "";
+  if (th.name === "ทุ่งหญ้า") extra = [12, 40, 70, 104, 138].map((x, i) => `<path d="M${x},${88 + (i % 2) * 9} l2,-5 l2,5 l2,-6 l2,6" stroke="#5FB070" stroke-width="1.2" fill="none"/>`).join("");
+  if (th.name === "ภูเขาไฟ") extra = `<path d="M96,70 L118,34 L126,34 L150,70Z" fill="#26111A"/><path d="M118,34 q4,-8 8,0" fill="#FF6A2C"/><path d="M0,86 Q40,82 80,88 T160,85" stroke="#FF6A2C" stroke-width="1.4" fill="none" opacity=".7"/>`;
+  if (th.name === "ชายทะเล") extra = [0, 1, 2].map(i => `<path d="M0,${66 + i * 3} q10,-2 20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0 t20,0" stroke="#BFE8FF" stroke-width=".8" fill="none" opacity="${0.6 - i * 0.15}"/>`).join("");
+  if (th.name === "ปราสาทมืด") extra = `<path d="M100,70 V44 h5 v-4 h3 v4 h4 V36 l4,-8 l4,8 v8 h4 v-4 h3 v4 h5 V70Z" fill="#100D26"/><rect x="118" y="48" width="3" height="5" fill="#FFC93C" opacity=".8"/>` + [[20, 14], [48, 24], [80, 10], [140, 18]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".8" fill="#fff"/>`).join("");
+  return `<svg class="bg" viewBox="0 0 160 120" preserveAspectRatio="none" aria-hidden="true"><defs>
+    <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.sky[0]}"/><stop offset="1" stop-color="${th.sky[1]}"/></linearGradient>
+    <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.g[0]}"/><stop offset="1" stop-color="${th.g[1]}"/></linearGradient></defs>
+    <rect width="160" height="120" fill="url(#${id}a)"/><circle cx="128" cy="24" r="9" fill="${th.orb}" opacity=".9"/><g transform="translate(0,8)">
+    <path d="M0,66 Q20,50 40,60 T80,55 T120,58 T160,50 V80 H0Z" fill="${th.far}"/>${th.name === "ภูเขาไฟ" || th.name === "ปราสาทมืด" ? extra : ""}
+    <path d="M0,74 Q30,62 60,71 T120,69 T160,66 V82 H0Z" fill="${th.near}"/>
+    <rect y="76" width="160" height="40" fill="url(#${id}b)"/><path d="M0,76 H160" stroke="#0004" stroke-width="1"/>
+    ${th.name === "ทุ่งหญ้า" || th.name === "ชายทะเล" ? extra : ""}</g></svg>`;
 }
+function fxSVG(el) {
+  const id = "f" + (++gid);
+  if (el === "fire") return `<svg viewBox="0 0 40 40"><defs><radialGradient id="${id}"><stop offset="0" stop-color="#FFF6C2"/><stop offset=".45" stop-color="#FFB02E"/><stop offset="1" stop-color="#FF4D1C" stop-opacity="0"/></radialGradient></defs><circle cx="20" cy="20" r="19" fill="url(#${id})"/></svg>`;
+  if (el === "water") return `<svg viewBox="0 0 40 40"><path d="M20,3 C28,15 33,21 33,27 A13,13 0 0 1 7,27 C7,21 12,15 20,3Z" fill="#5AB8FF"/><ellipse cx="15" cy="25" rx="3" ry="5" fill="#D8F0FF" opacity=".8"/></svg>`;
+  if (el === "leaf") return `<svg viewBox="0 0 40 40"><path d="M4,30 C8,8 30,4 36,6 C34,20 24,36 4,30Z" fill="#6BD27A"/><path d="M6,29 L32,9" stroke="#2F7A3A" stroke-width="2"/></svg>`;
+  if (el === "light") return `<svg viewBox="0 0 40 40"><path d="M20,1 L24,16 L39,20 L24,24 L20,39 L16,24 L1,20 L16,16Z" fill="#FFE680"/><circle cx="20" cy="20" r="5" fill="#fff"/></svg>`;
+  return `<svg viewBox="0 0 40 40"><defs><radialGradient id="${id}"><stop offset="0" stop-color="#1B0F2E"/><stop offset=".55" stop-color="#7B4CC4"/><stop offset="1" stop-color="#B07CFF" stop-opacity="0"/></radialGradient></defs><circle cx="20" cy="20" r="19" fill="url(#${id})"/></svg>`;
+}
+function fighterHTML(u, side, i, n) {
+  const [x, y] = (LAYOUT[n] || LAYOUT[3])[i] || [25, 85], X = side === "p" ? x : 100 - x;
+  return `<div class="fighter ${side} r${u.rarity}" id="${side}${i}" style="left:${X}%;top:${y}%;z-index:${y}">
+    <div class="mover"><div class="hpw">${gradeTag(u.rarity)}<div class="hp"><i></i></div></div>
+    <div class="body${side === "e" ? " flip" : ""}" style="animation-delay:${(-(i * 0.43 + (side === "e" ? 0.2 : 0))).toFixed(2)}s">${monSVG(u)}</div></div></div>`;
+}
+let battleSpeed = 2;
+try { battleSpeed = +localStorage.getItem("monster-egg-speed") || 2; } catch (e) { }
 async function fight() {
   if (S.busy) return; S.busy = true;
   const btn = $("#goFight"); btn.disabled = true;
   let d;
   try { d = await rpc("game_battle", { p_stage: S.stage }); }
   catch (e) { S.busy = false; btn.disabled = false; toast(e.message, true); return; }
-  $("#view").innerHTML = `<h2>ด่าน ${fmt(d.stage)}</h2><div id="arenaHost"></div>`;
+  const th = themeOf(d.stage), units = { p: d.team, e: d.enemies };
+  $("#view").innerHTML = `
+    <div class="stage2d" id="stage">${stageBG(th)}
+      <div class="hud"><span>${esc(th.name)} · ด่าน ${fmt(d.stage)}</span><span id="rnd">เตรียมตัว</span></div>
+      ${d.team.map((u, i) => fighterHTML(u, "p", i, d.team.length)).join("")}
+      ${d.enemies.map((u, i) => fighterHTML(u, "e", i, d.enemies.length)).join("")}
+    </div>
+    <div class="ctrl" id="ctrl"><span>ทีมคุณ ${d.team.length} ตัว · ศัตรู ${d.enemies.length} ตัว</span>
+      <span><button class="btn ghost small" id="fast" aria-label="ความเร็ว">×${battleSpeed}</button> <button class="btn ghost small" id="skip">ข้าม</button></span></div>`;
   window.scrollTo(0, 0);
-  const host = $("#arenaHost");
-  host.innerHTML = `<div class="arena" id="arena">
-      <div class="vs"><span>ศัตรู · ด่าน ${d.stage}</span><span id="rnd">รอบ 1</span></div>
-      <div class="side">${d.enemies.map((u, i) => unitHTML(u, true, i)).join("")}</div>
-      <div class="side">${d.team.map((u, i) => unitHTML(u, false, i)).join("")}</div>
-      <div class="vs"><span>ทีมคุณ</span><span><button class="btn ghost small" id="fast">เร็ว ×2</button> <button class="btn ghost small" id="skip">ข้าม</button></span></div>
-    </div>`;
-  let speed = 1, skip = false;
-  $("#fast").onclick = e => { speed = speed === 1 ? 2.2 : 1; e.target.textContent = speed === 1 ? "เร็ว ×2" : "ปกติ"; };
-  $("#skip").onclick = () => { skip = true; };
+  const stage = $("#stage");
+  let skip = reduced;
+  const sp = () => battleSpeed, wait = ms => skip ? Promise.resolve() : sleep(ms / sp());
+  const anim = (el, kf, ms, opt) => (skip || !el) ? Promise.resolve() : el.animate(kf, Object.assign({ duration: ms / sp(), easing: "ease-out" }, opt || {})).finished.catch(() => { });
+  $("#fast").onclick = e => { battleSpeed = battleSpeed >= 3 ? 1 : battleSpeed + 1; e.target.textContent = "×" + battleSpeed; try { localStorage.setItem("monster-egg-speed", battleSpeed); } catch (x) { } };
+  $("#skip").onclick = () => { skip = true; stage.getAnimations({ subtree: true }).forEach(a => { try { a.finish(); } catch (x) { } }); };
   const maxHp = { p: d.team.map(u => u.hp), e: d.enemies.map(u => u.hp) };
+  const F = (side, i) => $("#" + side + i);
   const setHp = (side, i, hp) => {
-    const el = $("#" + side + i); if (!el) return;
-    el.querySelector(".hp i").style.width = Math.max(0, hp / maxHp[side][i] * 100) + "%";
-    el.querySelector(".hpn").textContent = `${fmt(hp)} / ${fmt(maxHp[side][i])}`;
-    el.classList.toggle("dead", hp <= 0);
+    const f = F(side, i); if (!f) return;
+    f.querySelector(".hp i").style.width = Math.max(0, hp / maxHp[side][i] * 100) + "%";
+    f.querySelector(".hp").title = `${fmt(hp)} / ${fmt(maxHp[side][i])}`;
   };
+  const center = el => { const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect(); return [r.left + r.width / 2 - s.left, r.top + r.height / 2 - s.top]; };
+  const ko = async (side, i) => {
+    const f = F(side, i); if (!f || f.classList.contains("ko")) return;
+    f.classList.add("ko");
+    const dir = side === "p" ? -1 : 1;
+    await anim(f.querySelector(".mover"), [{ transform: "none", opacity: 1 }, { transform: `translate(${dir * 10}%, 12%) rotate(${dir * 75}deg)`, opacity: .35 }], 450, { fill: "forwards" });
+    if (skip) { const m = f.querySelector(".mover"); m.style.transform = `translate(${dir * 10}%, 12%) rotate(${dir * 75}deg)`; m.style.opacity = .35; }
+  };
+  const callout = async txt => { const c = document.createElement("div"); c.className = "callout"; c.textContent = txt; stage.appendChild(c);
+    await anim(c, [{ transform: "translate(-50%,-50%) scale(.4)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1.1)", opacity: 1, offset: .4 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 0 }], 900); c.remove(); };
+
+  // เดินเข้าฉาก
+  await Promise.all(["p", "e"].flatMap(s => units[s].map((u, i) => anim(F(s, i).querySelector(".mover"),
+    [{ transform: `translateX(${s === "p" ? -260 : 260}%)` }, { transform: "none" }], 650 + i * 90, { easing: "cubic-bezier(.2,.9,.3,1)" }))));
+  await callout("สู้!");
+
   for (const [r, side, a, t, dmg, fl, hp] of d.log) {
-    const tside = side === "p" ? "e" : "p";
-    if (skip) { setHp(tside, t, hp); continue; }
+    const ts = side === "p" ? "e" : "p", A = F(side, a), T = F(ts, t), dir = side === "p" ? 1 : -1;
+    if (skip || !A || !T) { setHp(ts, t, hp); if (hp <= 0) await ko(ts, t); continue; }
     $("#rnd").textContent = "รอบ " + r;
-    const at = $("#" + side + a), tg = $("#" + tside + t);
-    if (at && !reduced) at.classList.add(side === "p" ? "lunge-up" : "lunge-down");
-    await sleep(170 / speed);
-    if (at) at.classList.remove("lunge-up", "lunge-down");
-    if (tg) {
-      tg.classList.remove("hit"); void tg.offsetWidth; tg.classList.add("hit");
-      const pop = document.createElement("span");
-      pop.className = "pop" + (fl & 1 ? " crit" : "") + (fl & 2 ? " strong" : "") + (fl & 4 ? " weak" : "");
-      pop.textContent = "-" + fmt(dmg) + (fl & 1 ? " คริ!" : fl & 2 ? " แรง!" : "");
-      tg.appendChild(pop); setTimeout(() => pop.remove(), 900);
-    }
-    setHp(tside, t, hp);
-    await sleep(380 / speed);
+    const el = spOf(units[side][a]).element, am = A.querySelector(".mover"), tm = T.querySelector(".mover");
+    // ง้าง → ปล่อยของ → กลับที่
+    anim(am, [{ transform: "none" }, { transform: `translate(${dir * 16}%,-8%) scale(1.08)`, offset: .25 }, { transform: `translate(${dir * 16}%,-8%) scale(1.08)`, offset: .7 }, { transform: "none" }], 760);
+    await wait(180);
+    const [x0, y0] = center(A.querySelector(".body")), [x1, y1] = center(T.querySelector(".body"));
+    const lift = { fire: -.28, leaf: -.36, water: -.16, light: 0, dark: -.22 }[el] * stage.clientHeight;
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + lift, spin = (el === "leaf" || el === "light") ? 540 : 0;
+    const fx = document.createElement("div"); fx.className = "fx"; fx.innerHTML = fxSVG(el); stage.appendChild(fx);
+    await anim(fx, [
+      { transform: `translate(${x0}px,${y0}px) translate(-50%,-50%) rotate(0deg) scale(.6)` },
+      { transform: `translate(${mx}px,${my}px) translate(-50%,-50%) rotate(${spin / 2}deg) scale(1)`, offset: .5 },
+      { transform: `translate(${x1}px,${y1}px) translate(-50%,-50%) rotate(${spin}deg) scale(1.1)` }], el === "light" ? 240 : 360, { easing: "linear" });
+    fx.remove();
+    // โดน
+    const ring = document.createElement("div"); ring.className = "ring"; ring.style.setProperty("--fxc", FXC[el]); stage.appendChild(ring);
+    anim(ring, [{ transform: `translate(${x1}px,${y1}px) translate(-50%,-50%) scale(.3)`, opacity: 1 }, { transform: `translate(${x1}px,${y1}px) translate(-50%,-50%) scale(1.5)`, opacity: 0 }], 380).then(() => ring.remove());
+    anim(tm, [{ transform: "none", filter: "brightness(1)" }, { transform: `translateX(${dir * 9}%)`, filter: "brightness(2.3)", offset: .3 }, { transform: "none", filter: "brightness(1)" }], 300);
+    if (fl & 1) anim(stage, [{ transform: "none" }, { transform: "translate(-6px,3px)" }, { transform: "translate(5px,-3px)" }, { transform: "translate(-3px,2px)" }, { transform: "none" }], 300, { easing: "linear" });
+    const pop = document.createElement("span");
+    pop.className = "pop" + (fl & 1 ? " crit" : "") + (fl & 2 ? " strong" : "") + (fl & 4 ? " weak" : "");
+    pop.textContent = "-" + fmt(dmg) + (fl & 1 ? " คริ!" : fl & 2 ? " แรง!" : fl & 4 ? " เบา" : "");
+    T.appendChild(pop); setTimeout(() => pop.remove(), 950);
+    setHp(ts, t, hp);
+    if (hp <= 0) await ko(ts, t);
+    await wait(200);
   }
+  if (skip) d.log.forEach(([, side, , t, , , hp]) => { const ts = side === "p" ? "e" : "p"; setHp(ts, t, hp); });
+  // จบ: ฝั่งที่ชนะกระโดดดีใจ
+  const winSide = d.win ? "p" : "e";
+  skip = reduced;
+  await Promise.all(units[winSide].map((u, i) => { const f = F(winSide, i); return f && !f.classList.contains("ko") ? anim(f.querySelector(".mover"), [{ transform: "none" }, { transform: "translateY(-16%)", offset: .5 }, { transform: "none" }], 420, { iterations: 2, easing: "ease-in-out" }) : null; }));
   const ban = document.createElement("div");
   ban.className = "banner " + (d.win ? "win" : "lose");
   ban.innerHTML = d.win
     ? `<h3>ชนะ!</h3><div>ได้ <i class="coin"></i> <b class="num">${fmt(d.reward)}</b>${d.first ? " · ผ่านด่าน " + d.stage + " ครั้งแรก" : ""}</div>`
-    : `<h3>แพ้</h3><div class="muted">ศัตรูแรงไป ลองจัดทีมใหม่ เลือกธาตุที่ชนะทาง หรือฟักตัวที่แรงกว่านี้</div>`;
-  ban.innerHTML += `<div class="actions" style="width:100%;max-width:320px"><button class="btn" id="again">${d.win && d.first ? "ด่านถัดไป" : "สู้อีกครั้ง"}</button><button class="btn ghost" id="back">กลับ</button></div>`;
-  $("#arena").appendChild(ban);
+    : `<h3>แพ้</h3><div style="max-width:30ch">ลองจัดทีมใหม่ เลือกธาตุที่ชนะทาง หรือฟักตัวเกรดสูงกว่านี้</div>`;
+  stage.appendChild(ban);
+  $("#ctrl").innerHTML = `<div class="actions" style="width:100%"><button class="btn" id="again">${d.win && d.first ? "ด่านถัดไป" : "สู้อีกครั้ง"}</button><button class="btn ghost" id="back">กลับ</button></div>`;
   take(d);
   if (d.win && d.first) S.stage = d.stage + 1;
   S.busy = false;
   $("#again").onclick = () => { render(); setTimeout(() => { const b = $("#goFight"); if (b && !b.disabled) fight(); }, 30); };
   $("#back").onclick = () => render();
   $("#again").focus();
-  // อัปเดตแถบบน (เหรียญ/พลังงาน) โดยไม่ล้างสนาม
+  // อัปเดตแถบบน (เหรียญ/พลังงาน) โดยไม่ล้างฉาก
   const chip = document.querySelector(".top .chip"); if (chip) chip.innerHTML = `<i class="coin"></i>${fmt(S.me.coins)}`;
   document.querySelectorAll(".pip").forEach((p, i) => p.classList.toggle("on", i < S.me.energy));
 }
@@ -643,7 +738,7 @@ async function viewRank() {
     const d = await rpc("game_leaderboard");
     if (S.tab !== "rank") return;
     const rows = (d.top || []).map(x => `<div class="lb${x.me ? " me" : ""}"><div class="rk num">${x.rank}</div>
-      <div style="min-width:0"><div class="nm">${esc(x.name)}${x.me ? " (คุณ)" : ""}</div><div class="sub">ชนะ ${fmt(x.wins)} · มี ${fmt(x.total)} ตัว${x.mythic ? ` · <span class="r5" style="color:var(--rc)">เทพ ${fmt(x.mythic)}</span>` : ""}</div></div>
+      <div style="min-width:0"><div class="nm">${esc(x.name)}${x.me ? " (คุณ)" : ""}</div><div class="sub">ชนะ ${fmt(x.wins)} · มี ${fmt(x.total)} ตัว${x.ssr ? ` · <span class="r7" style="color:var(--rc)">SSR ${fmt(x.ssr)}</span>` : ""}</div></div>
       <div class="stg num">${fmt(x.best_stage)}<small>ด่าน</small></div></div>`).join("");
     const meOut = d.me && !(d.top || []).some(x => x.me) ? `<div class="muted" style="text-align:center;font-size:14px">คุณอยู่อันดับ ${fmt(d.me.rank)} จาก ${fmt(d.players)} คน</div>` : "";
     $("#board").innerHTML = (rows || `<div class="empty">ยังไม่มีผู้เล่น</div>`) + meOut;
@@ -665,7 +760,7 @@ function welcome(msg) {
   $("#app").innerHTML = `<section class="welcome">
     <div class="bigegg wobble" style="width:130px;height:160px;margin:0">${eggSVG("gold")}</div>
     <h1>Monster Egg</h1>
-    <p>ฟักไข่ สะสมมอนสเตอร์ ยิ่งแรร์ยิ่งตีแรง เลือดถึก แล้วพาทีมไต่ด่าน</p>
+    <p>ฟักไข่ สะสมมอนสเตอร์ 7 เกรด ตั้งแต่ D ถึง SSR ยิ่งเกรดสูงยิ่งตีแรง เลือดถึก แล้วพาทีมไต่ด่าน</p>
     <form id="startForm" novalidate>
       <label for="pname" class="muted" style="font-size:14px">ตั้งชื่อผู้เล่น</label>
       <input class="field" id="pname" maxlength="16" autocomplete="nickname" placeholder="เช่น นักฟักไข่" required>
