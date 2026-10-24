@@ -137,7 +137,7 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 .card{position:relative;display:flex;flex-direction:column;align-items:center;padding:8px 6px 8px;border-radius:16px;background:var(--night-2);border:2px solid var(--rc);text-align:center;min-width:0}
 .card .art{width:100%;aspect-ratio:1;border-radius:12px;background:radial-gradient(circle at 50% 60%, color-mix(in srgb,var(--rc) 22%,transparent), transparent 70%)}
 .card .art svg{width:100%;height:100%}
-.card .nm{font-family:var(--display);font-size:17px;line-height:1.1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.card .nm{font-family:var(--display);font-size:17px;line-height:1.45;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .card .st{font-size:12px;color:var(--mist)}
 .card .inteam{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:var(--yolk);color:var(--yolk-ink);font-size:12px;font-weight:600;display:grid;place-items:center}
 .r7.card,.r7.reveal{border-color:transparent;background:linear-gradient(var(--night-2),var(--night-2)) padding-box,conic-gradient(from var(--ang,0deg),#FF5FA2,#FFC93C,#43D69C,#5AB8FF,#9C8CFF,#FF5FA2) border-box}
@@ -231,6 +231,8 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
 .lb .stg{text-align:right;font-family:var(--display);font-size:20px}
 .lb .stg small{display:block;font-family:var(--body);font-size:11px;color:var(--mist)}
 
+.ver{font:inherit;font-size:12px;color:var(--mist);padding:0 6px;border-radius:999px;border:1px solid var(--line);background:var(--night-2)}
+.newver{position:fixed;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:70;background:var(--yolk);color:var(--yolk-ink);font-weight:600;padding:8px 16px;border-radius:999px;box-shadow:0 6px 20px #0008}
 .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;max-width:min(92vw,480px);
   background:var(--shell);color:var(--night);font-weight:600;padding:10px 18px;border-radius:14px;box-shadow:0 8px 30px #0007;text-align:center}
 .toast.bad{background:var(--bad);color:#2A0606}
@@ -258,6 +260,21 @@ h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.15}
    ═══════════════════════════════════════════════════════════════ */
 const SUPABASE_URL = "https://uybxunjogjhhvaynhoql.supabase.co";
 const SUPABASE_KEY = "sb_publishable_zpUV0iaVJPTuv9WKUMuUUg_WmX0_C_o";   // คีย์สาธารณะ (ใส่ในหน้าเว็บได้)
+
+/* เวอร์ชันเกม — แก้เกมครั้งไหนให้บวกเลขและเพิ่มบรรทัดบนสุดของ CHANGES */
+const GAME_VERSION = "1.3";
+const CHANGES = [
+  ["1.3", "24/10/2026", "แสดงเลขเวอร์ชัน (แตะดูรายการนี้) · เตือนเมื่อมีเวอร์ชันใหม่ · รองรับรูปตัวละครจากโฟลเดอร์ img · มังกรอิ๊กนิสแทนฟลามิ"],
+  ["1.2", "24/10/2026", "ฉากสู้ 2D อัตโนมัติ 4 ภูมิภาค · ท่าโจมตีตามธาตุ · ×1 ×2 ×3 · ข้าม"],
+  ["1.1", "24/10/2026", "เกรด D C B A S SS SSR · ป้ายเกรดบนตัวละคร · สลับตัวเข้าทีมที่เต็มแล้ว"],
+  ["1.0", "24/10/2026", "เปิดเกม: ฟักไข่ สู้ด่าน รางวัลรายวัน ตารางอันดับ · กันโกงด้วยเซิร์ฟเวอร์"],
+];
+
+/* รูปตัวละคร: สายพันธุ์ที่มีรูปใช้รูป (PNG พื้นใส สี่เหลี่ยมจัตุรัส) · ไม่มี = ตัวที่โค้ดวาดให้
+   face = ตัวในรูปหันไปทางไหน ("right" / "left") — เกมกลับด้านให้เองในฉากสู้ */
+const ART = {
+  1: { src: "img/1.png", face: "right" },   // อิ๊กนิส
+};
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -316,7 +333,20 @@ function blobPath(cx, cy, rx, ry, R, wob) {
   }
   return d + "Z";
 }
+function artSVG(m, a) {
+  const sp = (S.cat && S.cat.sp[m.species]) || {}, R = rng((m.dna | 0) ^ Math.imul(m.species + 1, 2654435761)), id = "i" + (++gid);
+  const hue = Math.round(R() * 24 - 12), sat = (0.9 + R() * 0.25).toFixed(2);   // DNA: เฉดสีต่างกันเล็กน้อยทุกตัว
+  let s = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(sp.name || "มอนสเตอร์")}"><defs>`
+    + `<filter id="${id}f" color-interpolation-filters="sRGB"><feColorMatrix type="hueRotate" values="${hue}"/><feColorMatrix type="saturate" values="${sat}"/></filter>`
+    + `<radialGradient id="${id}a" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
+  if (m.rarity >= 7) s += `<circle cx="60" cy="62" r="56" fill="url(#${id}a)"/>`;
+  s += `<ellipse cx="60" cy="112" rx="34" ry="5" fill="#000" opacity=".25"/>`;
+  s += `<g filter="url(#${id}f)"${a.face === "left" ? ` transform="translate(120,0) scale(-1,1)"` : ""}><image href="${esc(a.src)}" x="4" y="2" width="112" height="112" preserveAspectRatio="xMidYMax meet"/></g>`;
+  if (m.rarity >= 6) [[14, 20], [104, 26], [100, 92], [16, 88]].forEach(([x, y], i) => { const k = i % 2 ? 4 : 6; s += `<path d="M${x},${y - k} l${k * 0.3},${k * 0.7} l${k * 0.7},${k * 0.3} l-${k * 0.7},${k * 0.3} l-${k * 0.3},${k * 0.7} l-${k * 0.3},-${k * 0.7} l-${k * 0.7},-${k * 0.3} l${k * 0.7},-${k * 0.3}z" fill="#FFF3B0"/>`; });
+  return s + "</svg>";
+}
 function monSVG(m) {
+  if (ART[m.species]) return artSVG(m, ART[m.species]);
   const sp = (S.cat && S.cat.sp[m.species]) || { element: "fire" };
   const R = rng((m.dna | 0) ^ Math.imul(m.species + 1, 2654435761));
   const el = sp.element, id = "g" + (++gid);
@@ -419,7 +449,7 @@ function render() {
   const pips = Array.from({ length: P.energy_max }, (_, i) => `<i class="pip${i < P.energy ? " on" : ""}"></i>`).join("");
   app.innerHTML = `
     <header class="top">
-      <div class="who"><b>${esc(P.name)}</b><span>ด่านสูงสุด ${fmt(P.best_stage)}</span></div>
+      <div class="who"><b>${esc(P.name)}</b><span>ด่านสูงสุด ${fmt(P.best_stage)} · <button class="ver" id="ver" aria-label="เวอร์ชัน ${GAME_VERSION} ดูว่ามีอะไรใหม่">v${GAME_VERSION}</button></span></div>
       <div class="energy" title="พลังงานใช้สู้ครั้งละ 1"><div class="pips" aria-label="พลังงาน ${P.energy} จาก ${P.energy_max}">${pips}</div><span class="etime" id="etime"></span></div>
       <span class="chip num" aria-label="เหรียญ"><i class="coin"></i>${fmt(P.coins)}</span>
       <button class="gift${P.daily_ready ? " ready" : ""}" id="gift" aria-label="${P.daily_ready ? "รับรางวัลวันนี้" : "รับรางวัลวันนี้แล้ว"}">
@@ -428,6 +458,7 @@ function render() {
     </header>
     <main class="view" id="view"></main>`;
   $("#gift").onclick = claimDaily;
+  $("#ver").onclick = showChanges;
   ({ hatch: viewHatch, box: viewBox, fight: viewFight, rank: viewRank })[S.tab]();
   tick();
 }
@@ -754,6 +785,36 @@ async function claimDaily() {
   } catch (e) { toast(e.message, true); }
 }
 
+/* ── เวอร์ชัน: รายการเปลี่ยนแปลง + เตือนเมื่อบนเว็บมีเวอร์ชันใหม่ ── */
+function showChanges() {
+  closeSheet();
+  const wrap = document.createElement("div"); wrap.className = "scrim"; wrap.id = "scrim";
+  wrap.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="มีอะไรใหม่">
+    <h2>มีอะไรใหม่</h2>
+    <div class="board">${CHANGES.map(([v, d, txt]) => `<div class="lb" style="grid-template-columns:56px 1fr"><div class="rk${v === GAME_VERSION ? "" : " muted"}" style="font-size:20px">v${esc(v)}</div><div><div style="font-size:15px">${esc(txt)}</div><div class="sub">${esc(d)}</div></div></div>`).join("")}</div>
+    <button class="btn ghost" id="mClose">ปิด</button></div>`;
+  document.body.appendChild(wrap);
+  wrap.onclick = e => { if (e.target === wrap) closeSheet(); };
+  const kb = e => { if (e.key === "Escape") closeSheet(); }; document.addEventListener("keydown", kb); wrap._kb = kb;
+  $("#mClose").onclick = closeSheet; $("#mClose").focus();
+}
+async function checkUpdate() {
+  try {
+    const txt = await (await fetch(location.href.split("#")[0], { cache: "no-store" })).text();
+    const v = (/const GAME_VERSION = "([^"]+)"/.exec(txt) || [])[1];
+    if (v && v !== GAME_VERSION && !$("#newver")) {
+      const b = document.createElement("button"); b.id = "newver"; b.className = "newver";
+      b.textContent = `มีเวอร์ชันใหม่ v${v} · แตะเพื่อโหลด`; b.onclick = () => location.reload();
+      document.body.appendChild(b);
+    }
+  } catch (e) { }
+}
+setTimeout(checkUpdate, 15000); setInterval(checkUpdate, 5 * 60 * 1000);
+function checkArt() {   // รูปที่โหลดไม่ได้ (ยังไม่อัปโหลด/ชื่อผิด) = กลับไปใช้ตัวที่โค้ดวาด
+  Object.keys(ART).forEach(k => { const im = new Image(); im.onerror = () => { console.warn("ไม่พบรูปตัวละคร", ART[k].src); delete ART[k]; if (S.me && !S.busy) render(); }; im.src = ART[k].src; });
+}
+checkArt();
+
 /* ═══════════ เริ่มเกม ═══════════ */
 function welcome(msg) {
   $("#nav").classList.add("hidden");
@@ -768,6 +829,7 @@ function welcome(msg) {
       <button class="btn" type="submit" id="startBtn">เริ่มเล่น · รับ 300 เหรียญ</button>
     </form>
     <p class="note">บัญชีผูกกับเบราว์เซอร์นี้ ถ้าล้างข้อมูลเบราว์เซอร์ ตัวมอนสเตอร์จะหาย</p>
+    <button class="ver" id="ver">เวอร์ชัน ${GAME_VERSION}</button>
   </section>`;
   $("#startForm").onsubmit = async e => {
     e.preventDefault();
@@ -785,6 +847,7 @@ function welcome(msg) {
       toast("ได้ 300 เหรียญ ลองฟักไข่ใบแรกเลย");
     } catch (x) { err.textContent = x.message; btn.disabled = false; }
   };
+  $("#ver").onclick = showChanges;
   setTimeout(() => { const f = $("#pname"); if (f) f.focus(); }, 50);
 }
 async function boot() {
